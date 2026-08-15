@@ -81,8 +81,8 @@ export const portfolioData = {
   personal: {
     name: "Seemab Ali",
     brand: "Seemab",
-    role: "Software Developer",
-    title: "Software Engineering Graduate & Modern Web Developer",
+    role: "Full-Stack Developer",
+    title: "Software Engineering Graduate & AI-Powered Full-Stack Developer",
     badge: "Available for opportunities",
     heroHeadline: "Building modern digital experiences with code & AI.",
     heroBio:
@@ -90,9 +90,9 @@ export const portfolioData = {
     aboutBio:
       "I engineer clean, performant, and intuitive web applications using React, Next.js, TypeScript, and full-stack architectures. With a strong foundation in Software Engineering and a passion for modern AI integrations, I bridge the gap between complex backend systems and delightful user interfaces.",
     location: "Pakistan (Remote / Worldwide)",
-    email: "seemabali@proton.me",
-    github: "https://github.com/seemabali",
-    linkedin: "https://linkedin.com/in/seemabali7335",
+    email: "seemab.dev@gmail.com",
+    github: "https://github.com/seemab-ali",
+    linkedin: "https://linkedin.com/in/seemab-ali",
     resumeUrl: "#contact",
     heroPhoto: "/images/hero-portrait.png",
     stats: [

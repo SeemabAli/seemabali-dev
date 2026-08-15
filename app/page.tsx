@@ -26,7 +26,7 @@ export default function PortfolioPage() {
   return (
     <main className="relative min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500/20 selection:text-cyan-200">
       {/* Sticky Glass Navbar */}
-      <Navbar onOpenChat={openChat} />
+      <Navbar />
 
       {/* Hero Section */}
       <Hero onOpenChat={openChat} />

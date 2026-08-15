@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { portfolioData } from "@/data/portfolioData";
-import centerImage from "../public/Images/portfolioImage.png";
+import centerImage from "../public/Images/portfolioImage2.png";
 
 interface HeroProps {
   /** Called once the intro (scramble + slide-up) animation finishes,
