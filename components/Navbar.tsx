@@ -5,7 +5,11 @@ import { portfolioData } from "@/data/portfolioData";
 
 const NAV_LINKS = ["Home", "About", "Service", "Project", "Contact"] as const;
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onOpenChat?: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onOpenChat }) => {
   const [show, setShow] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,6 +68,15 @@ const Navbar: React.FC = () => {
               {item}
             </a>
           ))}
+          {onOpenChat && (
+            <button
+              type="button"
+              onClick={onOpenChat}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#ccff00]/40 text-[#ccff00] hover:bg-[#ccff00]/10 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
+            >
+              <span>✦ AI Assistant</span>
+            </button>
+          )}
         </div>
 
         {/* Mobile Menu Icon */}
@@ -120,6 +133,20 @@ const Navbar: React.FC = () => {
               {item}
             </a>
           ))}
+          {onOpenChat && (
+            <button
+              type="button"
+              style={{ transitionDelay: isMenuOpen ? `${NAV_LINKS.length * 100}ms` : "0ms" }}
+              onClick={() => {
+                setIsMenuOpen(false);
+                onOpenChat();
+              }}
+              className={`text-[#ccff00] text-2xl font-black uppercase tracking-widest hover:brightness-125 transition-all duration-500 ${isMenuOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+                }`}
+            >
+              ✦ Ask AI
+            </button>
+          )}
         </div>
       </div>
     </>

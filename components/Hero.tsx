@@ -9,6 +9,7 @@ interface HeroProps {
   /** Called once the intro (scramble + slide-up) animation finishes,
    *  so a parent layout can unlock the rest of the page. */
   onPreloadComplete?: () => void;
+  onOpenChat?: () => void;
 }
 
 const START_WORD = "SEEMAB";
@@ -20,7 +21,7 @@ function splitRole(role: string): [string, string] {
   return [first, rest.join(" ") || ""];
 }
 
-const Hero: React.FC<HeroProps> = ({ onPreloadComplete }) => {
+const Hero: React.FC<HeroProps> = ({ onPreloadComplete, onOpenChat }) => {
   const [text, setText] = useState(START_WORD);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
@@ -243,6 +244,18 @@ const Hero: React.FC<HeroProps> = ({ onPreloadComplete }) => {
               Contact
             </span>
           </a>
+
+          {onOpenChat && (
+            <button
+              type="button"
+              onClick={onOpenChat}
+              className="px-4 py-1.5 md:px-6 md:py-2.5 rounded-full border border-[#ccff00]/40 flex items-center justify-center backdrop-blur-md bg-[#ccff00]/10 hover:bg-[#ccff00]/20 text-[#ccff00] transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
+            >
+              <span className="text-xs md:text-base font-semibold tracking-wider flex items-center gap-1.5">
+                ✦ Ask AI
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
