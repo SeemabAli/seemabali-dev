@@ -1,275 +1,436 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   ExternalLink,
   Sparkles,
   ArrowUpRight,
   CheckCircle2,
-  Cpu,
-  Layers,
-  Calendar,
-  Users,
-  Code2,
-  Terminal,
-  ShieldAlert,
 } from "lucide-react";
+
 import { GithubIcon } from "@/components/icons/SocialIcons";
-import { portfolioData, Project } from "@/data/portfolioData";
+import { portfolioData, type Project } from "@/data/portfolioData";
 import ProjectModal from "./ProjectModal";
+import SpotlightCard from "@/components/SpotlightCard";
+
+const ACCENT = "#ccff00";
+const ACCENT_RGB = "204,255,0";
+
+/**
+ * Framer Motion variants
+ * Explicitly typed to prevent TypeScript from
+ * treating `ease` as a generic string.
+ */
+const lineContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.18,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const lineVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    x: -8,
+  },
+
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.35,
+      ease: "easeOut",
+    },
+  },
+};
 
 export default function Projects() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] =
+    useState<Project | null>(null);
 
-  // Helper visual mockups for each project
+  /**
+   * Project terminal visual
+   */
   const renderProjectVisual = (project: Project) => {
-    if (project.id === "codescry-ai") {
-      return (
-        <div className="w-full h-48 sm:h-56 bg-[#070d1a] p-4 flex flex-col justify-between font-mono text-xs relative overflow-hidden border-b border-white/[0.08]">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
-          
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              <span className="text-[11px] text-slate-400 ml-2">codescry-engine // v2.4</span>
-            </div>
-            <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[10px] border border-purple-500/30">
-              OpenAI + LangChain
-            </span>
-          </div>
+    const lines: { text: string; tone?: string }[] =
+      project.id === "codescry-ai"
+        ? [
+          {
+            text: "✓ AST Parser: 42 files scanned",
+          },
+          {
+            text: "✓ Security Audit: 0 High Vulnerabilities",
+          },
+          {
+            text: "⚡ AI code smell detected in auth_controller.ts",
+          },
+          {
+            text: "➔ Generating auto-fix patch via GPT-4o-mini...",
+          },
+        ]
+        : project.id === "lecture-timetable-system"
+          ? [
+            {
+              text: "Mon 09:00  →  CS-401 (Room 3A)",
+            },
+            {
+              text: "Mon 11:30  →  SE-302 (Lab 2)",
+            },
+            {
+              text: "Tue 14:00  →  AI-505 (Hall B)",
+            },
+            {
+              text: "✓ 0 room or instructor conflicts detected",
+            },
+          ]
+          : [
+            {
+              text: "Department Attendance ....... 96.4% overall",
+            },
+            {
+              text: "Active Members ............... 120+",
+            },
+            {
+              text: "Leave Approvals ............... 100%",
+            },
+            {
+              text: "✓ Monthly PDF / CSV export ready",
+            },
+          ];
 
-          <div className="space-y-1.5 text-[11px] text-slate-300 py-2">
-            <p className="text-cyan-300">✓ AST Parser: 42 files scanned</p>
-            <p className="text-emerald-400">✓ Security Audit: 0 High Vulnerabilities</p>
-            <p className="text-amber-300">⚡ AI Code Smell Detected in auth_controller.ts</p>
-            <p className="text-purple-300">➔ Generating auto-fix patch via GPT-4o-mini...</p>
-          </div>
+    const tag =
+      project.id === "codescry-ai"
+        ? "codescry-engine // v2.4"
+        : project.id === "lecture-timetable-system"
+          ? "timetable-solver // constraint-engine"
+          : "attendance-analytics // mern";
 
-          <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400">
-            <span>FastAPI Microservice</span>
-            <span className="text-emerald-400 font-bold">98.2% Precision</span>
-          </div>
-        </div>
-      );
-    }
-
-    if (project.id === "lecture-timetable-system") {
-      return (
-        <div className="w-full h-48 sm:h-56 bg-[#060f18] p-4 flex flex-col justify-between font-mono text-xs relative overflow-hidden border-b border-white/[0.08]">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-          
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              <span className="text-[11px] text-slate-400 ml-2">timetable-solver // constraint-engine</span>
-            </div>
-            <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] border border-emerald-500/30">
-              NextAuth + Mongo
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 py-2 text-[10px]">
-            <div className="bg-slate-900/80 p-2 rounded-lg border border-white/5">
-              <span className="text-slate-400 block">Mon 09:00</span>
-              <span className="text-cyan-300 font-semibold">CS-401 (Room 3A)</span>
-            </div>
-            <div className="bg-slate-900/80 p-2 rounded-lg border border-white/5">
-              <span className="text-slate-400 block">Mon 11:30</span>
-              <span className="text-purple-300 font-semibold">SE-302 (Lab 2)</span>
-            </div>
-            <div className="bg-slate-900/80 p-2 rounded-lg border border-white/5">
-              <span className="text-slate-400 block">Tue 14:00</span>
-              <span className="text-emerald-300 font-semibold">AI-505 (Hall B)</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400">
-            <span>Clash Prevention Engine</span>
-            <span className="text-cyan-300 font-bold">100% Conflict Free</span>
-          </div>
-        </div>
-      );
-    }
-
-    // attendance-management-system
     return (
-      <div className="w-full h-48 sm:h-56 bg-[#120a1c] p-4 flex flex-col justify-between font-mono text-xs relative overflow-hidden border-b border-white/[0.08]">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-        
-        <div className="flex items-center justify-between border-b border-white/5 pb-2">
+      <div className="relative flex h-48 w-full flex-col justify-between overflow-hidden border-b border-white/[0.08] bg-black p-4 font-mono text-xs sm:h-56">
+        {/* Ambient glow */}
+        <div
+          className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full blur-2xl"
+          style={{
+            background: `${ACCENT}14`,
+          }}
+        />
+
+        {/* Terminal header */}
+        <div className="relative z-10 flex items-center justify-between border-b border-white/5 pb-2">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-            <span className="text-[11px] text-slate-400 ml-2">attendance-analytics // mern</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+            <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+            <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+
+            <span className="ml-2 text-[11px] text-gray-500">
+              {tag}
+            </span>
           </div>
-          <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] border border-amber-500/30">
-            MERN Stack
+
+          <span
+            className="h-1.5 w-1.5 animate-pulse rounded-full"
+            style={{
+              backgroundColor: ACCENT,
+            }}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Terminal lines */}
+        <motion.div
+          variants={lineContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+          }}
+          className="relative z-10 space-y-1.5 py-2 text-[11px] text-gray-300"
+        >
+          {lines.map((line, index) => (
+            <motion.p
+              key={`${project.id}-line-${index}`}
+              variants={lineVariants}
+            >
+              {line.text}
+
+              {index === lines.length - 1 && (
+                <span
+                  className="ml-1 inline-block h-3 w-1.5 animate-pulse align-middle"
+                  style={{
+                    backgroundColor: ACCENT,
+                  }}
+                  aria-hidden="true"
+                />
+              )}
+            </motion.p>
+          ))}
+        </motion.div>
+
+        {/* Terminal footer */}
+        <div className="relative z-10 flex items-center justify-between border-t border-white/5 pt-2 text-[10px] text-gray-500">
+          <span>
+            {project.technologies?.[0] ?? "Runtime"} Runtime
           </span>
-        </div>
 
-        <div className="space-y-2 py-2">
-          <div className="flex justify-between items-center text-[11px]">
-            <span className="text-slate-300">Department Attendance</span>
-            <span className="text-amber-300 font-bold">96.4% Overall</span>
-          </div>
-          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-            <div className="bg-gradient-to-r from-amber-500 to-orange-400 h-2 rounded-full w-[96%]" />
-          </div>
-          <div className="flex justify-between text-[10px] text-slate-400 pt-1">
-            <span>Active Members: 120+</span>
-            <span className="text-emerald-400">Leave Approvals: 100%</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400">
-          <span>Enterprise Role-Based Access</span>
-          <span className="text-amber-400 font-bold">PDF / CSV Export</span>
+          <span
+            className="font-bold"
+            style={{
+              color: ACCENT,
+            }}
+          >
+            {project.metrics?.[0]?.value ?? "Live"}
+          </span>
         </div>
       </div>
     );
   };
 
   return (
-    <section id="projects" className="py-24 relative bg-[#040814]/90 overflow-hidden">
-      {/* Background radial glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
+    <section
+      id="projects"
+      className="relative overflow-hidden bg-black py-24"
+    >
+      {/* Ambient background animation */}
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 rounded-full blur-[150px]"
+        style={{
+          background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)`,
+        }}
+        animate={{
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-xs font-mono text-purple-300">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>03 // FEATURED WORK</span>
+        <div className="mb-16 flex flex-col items-center space-y-3 text-center">
+          <div
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-mono uppercase tracking-wider"
+            style={{
+              borderColor: `${ACCENT}4D`,
+              color: ACCENT,
+            }}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+
+            <span>03 // Featured Work</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Engineered Projects & <span className="gradient-text-hero">Full-Stack Solutions</span>
+          <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+            Engineered Projects &{" "}
+            <span style={{ color: ACCENT }}>
+              Full-Stack Solutions
+            </span>
           </h2>
 
-          <p className="text-slate-400 max-w-2xl text-sm sm:text-base leading-relaxed">
-            Real-world systems highlighting automated code intelligence, academic resource allocation algorithms, and full-stack enterprise portals.
+          <p className="max-w-2xl text-sm leading-relaxed text-gray-400 sm:text-base">
+            Real-world systems highlighting automated code
+            intelligence, academic resource allocation algorithms,
+            and full-stack enterprise portals.
           </p>
         </div>
 
-        {/* Project Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {portfolioData.projects.map((project, idx) => (
+        {/* Projects Grid */}
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-3">
+          {portfolioData.projects.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.15 }}
-              className="glass-panel-interactive rounded-3xl overflow-hidden flex flex-col justify-between group"
+              initial={{
+                opacity: 0,
+                y: 30,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.15,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.15,
+                ease: "easeOut",
+              }}
+              whileHover={{
+                y: -6,
+              }}
+              className="relative rounded-3xl"
             >
-              <div>
-                {/* Visual Preview Box */}
-                {renderProjectVisual(project)}
+              {/* Featured animated ring */}
+              {project.featured && (
+                <div className="pointer-events-none absolute -inset-[1.5px] overflow-hidden rounded-3xl">
+                  <motion.div
+                    className="absolute -inset-[50%]"
+                    style={{
+                      background: `conic-gradient(from 0deg, transparent 0%, ${ACCENT} 12%, transparent 26%)`,
+                    }}
+                    animate={{
+                      rotate: 360,
+                    }}
+                    transition={{
+                      duration: 7,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                </div>
+              )}
 
-                {/* Card Body */}
-                <div className="p-6 sm:p-7 space-y-4">
-                  {/* Category & Badge */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-cyan-400">
-                      {project.category}
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-slate-300">
-                      {project.badgeText}
-                    </span>
-                  </div>
+              <SpotlightCard
+                spotlightRgb={ACCENT_RGB}
+                className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-black"
+              >
+                <div className="flex h-full flex-col">
+                  {/* Project Visual */}
+                  {renderProjectVisual(project)}
 
-                  {/* Title & Tagline */}
-                  <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 font-medium line-clamp-1">
-                      {project.tagline}
-                    </p>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed line-clamp-3">
-                    {project.description}
-                  </p>
-
-                  {/* Key Features Bullet points */}
-                  <div className="space-y-1.5 pt-2">
-                    {project.features.slice(0, 3).map((feat, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs text-slate-400">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                        <span className="truncate">{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Tech Stack Pills */}
-                  <div className="flex flex-wrap gap-1.5 pt-3">
-                    {project.technologies.slice(0, 5).map((tech) => (
+                  {/* Card Body */}
+                  <div className="flex-1 space-y-4 p-6 sm:p-7">
+                    {/* Category */}
+                    <div className="flex items-center justify-between gap-2">
                       <span
-                        key={tech}
-                        className="px-2 py-1 rounded-lg bg-slate-900/90 border border-white/[0.08] text-[11px] font-mono text-slate-300"
+                        className="text-xs font-mono"
+                        style={{
+                          color: ACCENT,
+                        }}
                       >
-                        {tech}
+                        {project.category}
                       </span>
-                    ))}
-                    {project.technologies.length > 5 && (
-                      <span className="px-2 py-1 rounded-lg bg-slate-900/50 border border-white/5 text-[11px] font-mono text-slate-400">
-                        +{project.technologies.length - 5}
+
+                      <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] font-mono text-gray-400">
+                        {project.badgeText}
                       </span>
-                    )}
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <h3 className="text-xl font-bold tracking-tight text-white">
+                        {project.title}
+                      </h3>
+
+                      <p className="mt-1 line-clamp-1 text-xs font-medium text-gray-500">
+                        {project.tagline}
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    <p className="line-clamp-3 text-xs leading-relaxed text-gray-300 sm:text-sm">
+                      {project.description}
+                    </p>
+
+                    {/* Features */}
+                    <div className="space-y-1.5 pt-2">
+                      {project.features
+                        .slice(0, 3)
+                        .map((feature, featureIndex) => (
+                          <div
+                            key={`${project.id}-feature-${featureIndex}`}
+                            className="flex items-center gap-2 text-xs text-gray-400"
+                          >
+                            <CheckCircle2
+                              className="h-3.5 w-3.5 shrink-0"
+                              style={{
+                                color: ACCENT,
+                              }}
+                            />
+
+                            <span className="truncate">
+                              {feature}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+
+                    {/* Technologies */}
+                    <div className="flex flex-wrap gap-1.5 pt-3">
+                      {project.technologies
+                        .slice(0, 5)
+                        .map((technology) => (
+                          <span
+                            key={`${project.id}-${technology}`}
+                            className="rounded-lg border border-white/[0.08] bg-white/5 px-2 py-1 text-[11px] font-mono text-gray-300"
+                          >
+                            {technology}
+                          </span>
+                        ))}
+
+                      {project.technologies.length > 5 && (
+                        <span className="rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1 text-[11px] font-mono text-gray-500">
+                          +
+                          {project.technologies.length -
+                            5}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Footer */}
+                  <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/[0.06] px-6 pb-6 pt-4">
+                    {/* Details */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedProject(project)
+                      }
+                      className="flex items-center gap-1 text-xs font-semibold transition-opacity hover:opacity-80"
+                      style={{
+                        color: ACCENT,
+                      }}
+                    >
+                      <span>Details</span>
+
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </button>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      {/* GitHub */}
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`GitHub repository for ${project.title}`}
+                        title="GitHub Repository"
+                        className="rounded-xl border border-white/10 bg-white/5 p-2 text-gray-300 transition-colors hover:bg-white hover:text-black"
+                      >
+                        <GithubIcon className="h-4 w-4" />
+                      </a>
+
+                      {/* Live Demo */}
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Live demo for ${project.title}`}
+                        className="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold text-black transition-transform hover:scale-[1.03]"
+                        style={{
+                          backgroundColor: ACCENT,
+                        }}
+                      >
+                        <span>Live Demo</span>
+
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Card Footer Actions */}
-              <div className="px-6 pb-6 pt-2 flex items-center justify-between gap-2 border-t border-white/[0.06]">
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(project)}
-                  className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
-                >
-                  <span>Details</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`GitHub repository for ${project.title}`}
-                    className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 transition-colors"
-                    title="GitHub Repository"
-                  >
-                    <GithubIcon className="w-4 h-4" />
-                  </a>
-
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-600/20 transition-all duration-200"
-                  >
-                    <span>Live Demo</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>
-
       </div>
 
-      {/* Deep-Dive Project Modal */}
+      {/* Project Modal */}
       <ProjectModal
         project={selectedProject}
         onClose={() => setSelectedProject(null)}

@@ -90,9 +90,9 @@ export const portfolioData = {
     aboutBio:
       "I engineer clean, performant, and intuitive web applications using React, Next.js, TypeScript, and full-stack architectures. With a strong foundation in Software Engineering and a passion for modern AI integrations, I bridge the gap between complex backend systems and delightful user interfaces.",
     location: "Pakistan (Remote / Worldwide)",
-    email: "seemab.dev@gmail.com",
-    github: "https://github.com/seemab-ali",
-    linkedin: "https://linkedin.com/in/seemab-ali",
+    email: "seemabali@proton.me",
+    github: "https://github.com/seemabali",
+    linkedin: "https://linkedin.com/in/seemabali7335",
     resumeUrl: "#contact",
     heroPhoto: "/images/hero-portrait.png",
     stats: [

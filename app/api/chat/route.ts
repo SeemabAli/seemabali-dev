@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT, getLocalFallbackResponse } from "@/lib/chatbotKnowledge";
 
 export const runtime = "nodejs";
+
+// Override with a GEMINI_MODEL env var if you want to point at a
+// different Gemini model without touching code. "gemini-2.5-flash" is
+// the current stable, widely-available flash model as of mid-2026;
+// newer previews (e.g. gemini-3.5-flash) may need allowlisting on your
+// API key, so this stays on the safer default.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
+interface ChatMessage {
+  role: string;
+  content: string;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,41 +28,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const lastUserMessage = messages
-      .slice()
-      .reverse()
-      .find((m: { role: string; content: string }) => m.role === "user")?.content || "";
+    const lastUserMessage =
+      messages
+        .slice()
+        .reverse()
+        .find((m: ChatMessage) => m.role === "user")?.content || "";
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    // If an OpenAI API key is configured, use OpenAI
-    if (apiKey && apiKey.trim().length > 0 && !apiKey.includes("your-openai-api-key")) {
+    // If a Gemini API key is configured, use Gemini
+    if (apiKey && apiKey.trim().length > 0 && !apiKey.includes("your-gemini-api-key")) {
       try {
-        const openai = new OpenAI({ apiKey });
+        const ai = new GoogleGenAI({ apiKey });
 
-        const formattedMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages.map((m: { role: string; content: string }) => ({
-            role: (m.role === "user" ? "user" : "assistant") as "user" | "assistant",
-            content: m.content,
-          })),
-        ];
+        // Gemini uses "user" / "model" roles (not "assistant"), and takes
+        // the full conversation history as `contents` on every call since
+        // generateContent is stateless between requests.
+        const contents = messages.map((m: ChatMessage) => ({
+          role: m.role === "user" ? "user" : "model",
+          parts: [{ text: m.content }],
+        }));
 
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: formattedMessages,
-          temperature: 0.5,
-          max_tokens: 500,
+        const response = await ai.models.generateContent({
+          model: GEMINI_MODEL,
+          contents,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            temperature: 0.5,
+            maxOutputTokens: 500,
+          },
         });
 
-        const reply = response.choices[0]?.message?.content || "I apologize, I could not generate a response.";
+        const reply = response.text || "I apologize, I could not generate a response.";
 
         return NextResponse.json({
           reply,
-          source: "openai",
+          source: "gemini",
         });
-      } catch (openAiError: unknown) {
-        console.warn("OpenAI API call encountered an error. Falling back to local semantic knowledge base:", openAiError);
+      } catch (geminiError: unknown) {
+        console.warn(
+          "Gemini API call encountered an error. Falling back to local semantic knowledge base:",
+          geminiError
+        );
         // Fallback to local intelligent knowledge base seamlessly
         const fallbackReply = getLocalFallbackResponse(lastUserMessage);
         return NextResponse.json({

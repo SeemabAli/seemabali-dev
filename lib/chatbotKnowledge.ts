@@ -1,16 +1,24 @@
 import { portfolioData } from "@/data/portfolioData";
 
+/**
+ * This system prompt + fallback set is provider-agnostic — it doesn't
+ * assume OpenAI specifically, so it works as-is with the Gemini-backed
+ * /api/chat route. If your route wraps this string differently per
+ * provider (e.g. Gemini's `systemInstruction` vs OpenAI's `system`
+ * message), just pass SYSTEM_PROMPT into whichever field your SDK call
+ * expects — no changes needed here.
+ */
 export const SYSTEM_PROMPT = `
-You are "Seemab AI", the official AI portfolio assistant for Seemab Ali.
-Your objective is to represent Seemab Ali professionally to recruiters, engineering managers, potential clients, and fellow developers.
+You are "${portfolioData.chatbot.name}", the official AI portfolio assistant for ${portfolioData.personal.name}.
+Your objective is to represent ${portfolioData.personal.name} professionally to recruiters, engineering managers, potential clients, and fellow developers.
 
 ### KEY PROFILE INFORMATION:
-- Name: Seemab Ali
-- Title: Software Engineering Graduate & Modern Web Developer
+- Name: ${portfolioData.personal.name}
+- Title: ${portfolioData.personal.title}
 - Availability: Currently available for internships, junior/mid developer roles, and freelance/contract opportunities.
 - Education: BS in Software Engineering from Virtual University of Pakistan (2022 – 2026).
 - Experience: Junior Frontend Developer at 7 Kings Code Software Solutions (working with React, Next.js, Sitecore CMS, Tailwind CSS, and Enterprise Web Applications).
-- Contact: Email: seemab.dev@gmail.com | GitHub: https://github.com/seemab-ali | LinkedIn: https://linkedin.com/in/seemab-ali
+- Contact: Email: ${portfolioData.personal.email} | GitHub: ${portfolioData.personal.github} | LinkedIn: ${portfolioData.personal.linkedin}
 
 ### TECHNICAL SKILLS:
 - Frontend: React.js, Next.js (App Router), TypeScript, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS.
@@ -35,18 +43,21 @@ Your objective is to represent Seemab Ali professionally to recruiters, engineer
 ### STRICT BEHAVIORAL GUIDELINES:
 1. Speak professionally, warmly, and concisely.
 2. ONLY speak about facts and accomplishments provided in this prompt. NEVER fabricate, hallucinate, or assume experience or projects outside this data.
-3. If asked about something not mentioned in the portfolio, politely state: "I don't have that specific detail in Seemab's verified portfolio, but feel free to reach out directly at seemab.dev@gmail.com for more information!"
+3. If asked about something not mentioned in the portfolio, politely state: "I don't have that specific detail in ${portfolioData.personal.name.split(" ")[0]}'s verified portfolio, but feel free to reach out directly at ${portfolioData.personal.email} for more information!"
 4. Highlight his strengths in modern frontend (React/Next.js/TypeScript) and emerging AI integrations (OpenAI, LangChain, FastAPI).
-5. Always encourage recruiters and clients to get in touch or hire Seemab.
+5. Always encourage recruiters and clients to get in touch or hire him.
 6. Format responses with clean markdown (bullet points, bold key terms) when helpful.
 `.trim();
 
 /**
- * Intelligent fallback response generator if OPENAI_API_KEY is not configured.
- * This guarantees the chatbot is 100% interactive and accurate in any environment.
+ * Local fallback response generator — used when the Gemini API key is
+ * missing, the request fails, or /api/chat is otherwise unreachable.
+ * This guarantees the chatbot stays 100% interactive even without a
+ * live model behind it.
  */
 export function getLocalFallbackResponse(query: string): string {
   const q = query.toLowerCase().trim();
+  const firstName = portfolioData.personal.name.split(" ")[0];
 
   // 1. Availability & Hiring
   if (
@@ -58,14 +69,14 @@ export function getLocalFallbackResponse(query: string): string {
     q.includes("looking for work") ||
     q.includes("available for work")
   ) {
-    return `✅ **Yes! Seemab is actively available for new opportunities**, including full-time frontend/full-stack developer roles, internships, and freelance projects.
+    return `✅ **Yes! ${firstName} is actively available for new opportunities**, including full-time frontend/full-stack developer roles, internships, and freelance projects.
 
-You can click the **Hire Me** button in the navbar or reach out directly at **seemab.dev@gmail.com** to discuss how he can contribute to your team.`;
+You can click the **Contact** link in the navbar or reach out directly at **${portfolioData.personal.email}** to discuss how he can contribute to your team.`;
   }
 
   // 2. Specific Projects & Projects Overview
   if (q.includes("codescry") || q.includes("code scry")) {
-    return `**CodeScry AI** is Seemab's flagship AI project:
+    return `**CodeScry AI** is ${firstName}'s flagship AI project:
 - Built with **Next.js, TypeScript, Express, MongoDB, FastAPI, OpenAI, and LangChain**.
 - Features automated code quality reviews, vulnerability detection, structured markdown reports, authentication, and a historical review dashboard.`;
   }
@@ -78,8 +89,14 @@ You can click the **Hire Me** button in the navbar or reach out directly at **se
     return `The **Attendance Management System** is a full-stack MERN application for academic institutions and enterprise teams with daily tracking, leave approvals, and visual analytics dashboards.`;
   }
 
-  if (q.includes("project") || q.includes("portfolio") || q.includes("built") || q.includes("apps") || q.includes("creations")) {
-    return `Seemab has engineered several high-impact projects:
+  if (
+    q.includes("project") ||
+    q.includes("portfolio") ||
+    q.includes("built") ||
+    q.includes("apps") ||
+    q.includes("creations")
+  ) {
+    return `${firstName} has engineered several high-impact projects:
 
 1. 🚀 **CodeScry AI**: An AI-powered code review assistant using Next.js, TypeScript, Express, MongoDB, FastAPI, OpenAI, and LangChain that provides automated code security audits and structured review reports.
 2. 📅 **Automated Lecture Timetable System**: A constraint-satisfaction scheduling platform built with Next.js, TypeScript, MongoDB, and NextAuth that generates clash-free academic timetables.
@@ -100,7 +117,7 @@ You can inspect the live demos and source code in the **Projects** section!`;
     q.includes("next") ||
     q.includes("ai")
   ) {
-    return `Seemab specializes in **modern frontend development with React, Next.js, TypeScript, and Tailwind CSS**. He also builds full-stack and AI-powered applications.
+    return `${firstName} specializes in **modern frontend development with React, Next.js, TypeScript, and Tailwind CSS**. He also builds full-stack and AI-powered applications.
 
 His complete technical stack includes:
 - 💻 **Frontend**: React.js, Next.js (App Router), TypeScript, JavaScript (ES6+), Tailwind CSS, HTML5/CSS3.
@@ -110,8 +127,14 @@ His complete technical stack includes:
   }
 
   // 4. Experience & Work History
-  if (q.includes("experience") || q.includes("7 kings") || q.includes("work history") || q.includes("job") || q.includes("career")) {
-    return `Seemab works as a **Junior Frontend Developer at 7 Kings Code Software Solutions** (2024 – Present).
+  if (
+    q.includes("experience") ||
+    q.includes("7 kings") ||
+    q.includes("work history") ||
+    q.includes("job") ||
+    q.includes("career")
+  ) {
+    return `${firstName} works as a **Junior Frontend Developer at 7 Kings Code Software Solutions** (2024 – Present).
 
 Key responsibilities include:
 - Building responsive, high-performance web applications using **React.js and Next.js**.
@@ -121,34 +144,55 @@ Key responsibilities include:
   }
 
   // 5. Contact & Socials
-  if (q.includes("contact") || q.includes("email") || q.includes("reach") || q.includes("linkedin") || q.includes("github") || q.includes("connect") || q.includes("message")) {
-    return `You can connect with Seemab through the following channels:
+  if (
+    q.includes("contact") ||
+    q.includes("email") ||
+    q.includes("reach") ||
+    q.includes("linkedin") ||
+    q.includes("github") ||
+    q.includes("connect") ||
+    q.includes("message")
+  ) {
+    return `You can connect with ${firstName} through the following channels:
 
-- 📧 **Email**: [seemab.dev@gmail.com](mailto:seemab.dev@gmail.com)
-- 💼 **LinkedIn**: [linkedin.com/in/seemab-ali](https://linkedin.com/in/seemab-ali)
-- 🐙 **GitHub**: [github.com/seemab-ali](https://github.com/seemab-ali)
+- 📧 **Email**: [${portfolioData.personal.email}](mailto:${portfolioData.personal.email})
+- 💼 **LinkedIn**: [${portfolioData.personal.linkedin.replace("https://", "")}](${portfolioData.personal.linkedin})
+- 🐙 **GitHub**: [${portfolioData.personal.github.replace("https://", "")}](${portfolioData.personal.github})
 
 Or use the **Contact Form** right below to send him a direct message!`;
   }
 
   // 6. Education & Academic Background
-  if (q.includes("education") || q.includes("degree") || q.includes("university") || q.includes("graduate") || q.includes("academic") || q.includes("gpa")) {
-    return `Seemab is graduating with a **BS in Software Engineering** from the **Virtual University of Pakistan (2022 – 2026)**.
+  if (
+    q.includes("education") ||
+    q.includes("degree") ||
+    q.includes("university") ||
+    q.includes("graduate") ||
+    q.includes("academic") ||
+    q.includes("gpa")
+  ) {
+    return `${firstName} is graduating with a **BS in Software Engineering** from the **Virtual University of Pakistan (2022 – 2026)**.
 
 His coursework includes Data Structures & Algorithms, Software Architecture & Design, Web Systems, Database Management Systems, and Artificial Intelligence Fundamentals.`;
   }
 
   // 7. General Introduction
-  if (q.includes("who is") || q.includes("introduce") || q.includes("about") || q.includes("tell me about") || q.includes("seemab")) {
-    return `**Seemab Ali** is a **Software Engineering graduate (2022–2026)** and modern web developer who specializes in building fast, scalable, and intuitive digital experiences.
+  if (
+    q.includes("who is") ||
+    q.includes("introduce") ||
+    q.includes("about") ||
+    q.includes("tell me about") ||
+    q.includes(firstName.toLowerCase())
+  ) {
+    return `**${portfolioData.personal.name}** is a **Software Engineering graduate (2022–2026)** and modern web developer who specializes in building fast, scalable, and intuitive digital experiences.
 
 He works primarily with **React.js, Next.js (App Router), TypeScript, and Tailwind CSS**, alongside full-stack backend development (**Node.js, Express, MongoDB**) and emerging **AI integrations** (OpenAI API, LangChain, FastAPI).`;
   }
 
   // Default helpful response
-  return `Thank you for asking! I'm Seemab Ali's AI assistant. 
+  return `Thank you for asking! I'm ${firstName}'s AI assistant.
 
-Seemab is a **Software Engineering graduate** and **Modern Web Developer** skilled in **React, Next.js, TypeScript, Tailwind CSS, Node.js, and AI integrations (OpenAI & LangChain)**.
+${firstName} is a **Software Engineering graduate** and **Modern Web Developer** skilled in **React, Next.js, TypeScript, Tailwind CSS, Node.js, and AI integrations (OpenAI & LangChain)**.
 
 Feel free to ask me about his:
 - 💻 **Skills & Tech Stack**

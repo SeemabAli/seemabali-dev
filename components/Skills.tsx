@@ -9,12 +9,21 @@ import {
   Wrench,
   Sparkles,
   CheckCircle2,
-  Code2,
-  Database,
-  Terminal,
   Layers,
 } from "lucide-react";
-import { portfolioData, SkillCategory } from "@/data/portfolioData";
+import { portfolioData } from "@/data/portfolioData";
+import SpotlightCard from "@/components/SpotlightCard";
+
+const ACCENT = "#ccff00";
+const ACCENT_RGB = "204,255,0";
+
+// Approximate fill percentage per skill level — purely visual, gives the
+// bars something meaningful to animate to.
+const LEVEL_FILL: Record<string, number> = {
+  Specialized: 95,
+  Advanced: 88,
+  Proficient: 72,
+};
 
 export default function Skills() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -31,62 +40,85 @@ export default function Skills() {
       ? portfolioData.skills
       : portfolioData.skills.filter((c) => c.title === activeCategory);
 
+  const tabs = ["all", ...portfolioData.skills.map((c) => c.title)];
+
   return (
-    <section id="skills" className="py-24 relative bg-[#030712] overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
+    <section id="skills" className="py-24 relative bg-black overflow-hidden">
+      {/* Slowly drifting ambient glows — the "alive" background */}
+      <motion.div
+        className="absolute top-1/2 left-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${ACCENT}1F 0%, transparent 70%)` }}
+        animate={{ x: [0, 60, 0], y: [0, 30, 0] }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-10 right-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
+        animate={{ x: [0, -50, 0], y: [0, -40, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-12 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-xs font-mono text-cyan-300">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono uppercase tracking-wider"
+            style={{ borderColor: `${ACCENT}4D`, color: ACCENT }}
+          >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>02 // TECH STACK & EXPERTISE</span>
+            <span>02 // Tech Stack & Expertise</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Specialized Skills & <span className="gradient-text-cyan-blue">Modern Technologies</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            Specialized Skills & <span style={{ color: ACCENT }}>Modern Technologies</span>
           </h2>
 
-          <p className="text-slate-400 max-w-2xl text-sm sm:text-base leading-relaxed">
-            A comprehensive overview of the programming languages, frameworks, cloud tools, and AI technologies in my daily workflow.
+          <p className="text-gray-400 max-w-2xl text-sm sm:text-base leading-relaxed">
+            A comprehensive overview of the programming languages, frameworks, cloud
+            tools, and AI technologies in my daily workflow.
           </p>
 
-          {/* Category Filter Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
-            <button
-              type="button"
-              onClick={() => setActiveCategory("all")}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
-                activeCategory === "all"
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 border border-blue-400/40"
-                  : "bg-slate-900/80 text-slate-400 hover:text-white border border-white/10 hover:bg-slate-800"
-              }`}
-            >
-              All Skills ({portfolioData.skills.reduce((acc, cat) => acc + cat.skills.length, 0)})
-            </button>
+          {/* Category Filter Tabs — sliding active pill */}
+          <div className="relative flex flex-wrap items-center justify-center gap-2 pt-4">
+            {tabs.map((tab) => {
+              const isAll = tab === "all";
+              const label = isAll
+                ? `All Skills (${portfolioData.skills.reduce(
+                  (acc, cat) => acc + cat.skills.length,
+                  0
+                )})`
+                : tab;
+              const isActive = activeCategory === tab;
 
-            {portfolioData.skills.map((category) => (
-              <button
-                key={category.title}
-                type="button"
-                onClick={() => setActiveCategory(category.title)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
-                  activeCategory === category.title
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 border border-blue-400/40"
-                    : "bg-slate-900/80 text-slate-400 hover:text-white border border-white/10 hover:bg-slate-800"
-                }`}
-              >
-                <span>{category.title}</span>
-              </button>
-            ))}
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveCategory(tab)}
+                  className="relative px-4 py-2 rounded-xl text-xs font-semibold transition-colors duration-200"
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeSkillTab"
+                      className="absolute inset-0 rounded-xl"
+                      style={{ backgroundColor: ACCENT }}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <span
+                    className="relative z-10"
+                    style={{ color: isActive ? "#000" : "#9ca3af" }}
+                  >
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Skill Category Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {filteredCategories.map((category, idx) => (
             <motion.div
               key={category.title}
@@ -94,64 +126,83 @@ export default function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="glass-panel-interactive rounded-3xl p-6 sm:p-8 flex flex-col justify-between group"
             >
-              {/* Category Header */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 group-hover:border-cyan-500/40 transition-all duration-300 shadow-md">
-                      {categoryIcons[category.title] || <Layers className="w-5 h-5" />}
-                    </div>
+              <SpotlightCard
+                spotlightRgb={ACCENT_RGB}
+                className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 hover:border-white/25 transition-colors duration-300"
+              >
+                {/* Category Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className="w-12 h-12 rounded-2xl border flex items-center justify-center transition-transform duration-300 hover:scale-110"
+                    style={{ borderColor: `${ACCENT}33`, backgroundColor: `${ACCENT}0D`, color: ACCENT }}
+                  >
+                    {categoryIcons[category.title] || <Layers className="w-5 h-5" />}
+                  </div>
 
-                    <div>
-                      <h3 className="text-lg font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
-                        {category.title}
-                      </h3>
-                      <span className="text-xs font-mono text-slate-400">
-                        {category.skills.length} Technologies
-                      </span>
-                    </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white tracking-tight">
+                      {category.title}
+                    </h3>
+                    <span className="text-xs font-mono text-gray-500">
+                      {category.skills.length} Technologies
+                    </span>
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-400 mb-6 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-400 mb-6 leading-relaxed">
                   {category.description}
                 </p>
 
-                {/* Skills Badges Grid */}
-                <div className="flex flex-wrap gap-2.5">
-                  {category.skills.map((skill) => (
-                    <div
-                      key={skill.name}
-                      className="group/item relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/[0.08] hover:border-cyan-500/40 transition-all duration-200 cursor-default"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                      <span className="text-xs font-medium text-slate-200 group-hover/item:text-white">
-                        {skill.name}
-                      </span>
-                      {skill.badge && (
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-blue-500/20 text-cyan-300 border border-blue-400/20">
-                          {skill.badge}
+                {/* Skills with animated proficiency bars */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+                  {category.skills.map((skill, sIdx) => (
+                    <div key={skill.name} className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-medium text-gray-200 truncate">
+                          {skill.name}
                         </span>
-                      )}
+                        {skill.badge && (
+                          <span
+                            className="text-[9px] font-mono px-1.5 py-0.5 rounded-md border shrink-0"
+                            style={{ borderColor: `${ACCENT}33`, color: ACCENT }}
+                          >
+                            {skill.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{
+                            width: `${LEVEL_FILL[skill.level] ?? 70}%`,
+                          }}
+                          viewport={{ once: true }}
+                          transition={{
+                            duration: 0.9,
+                            delay: sIdx * 0.06,
+                            ease: "easeOut",
+                          }}
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: ACCENT }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
 
-              {/* Bottom tag indicator */}
-              <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
-                <span className="flex items-center gap-1.5 text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Verified Production Stack
-                </span>
-                <span>Active 2026</span>
-              </div>
+                {/* Bottom tag indicator */}
+                <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-gray-500">
+                  <span className="flex items-center gap-1.5" style={{ color: ACCENT }}>
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Verified Production Stack
+                  </span>
+                  <span>Active 2026</span>
+                </div>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   );
