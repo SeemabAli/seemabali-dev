@@ -69,7 +69,7 @@ export const metadata: Metadata = {
       { url: "/favicon.ico" },
     ],
     shortcut: "/icon.jpg",
-    apple: "/icon.jpg",
+    apple: "/Images/code.jpg",
   },
   robots: {
     index: true,
