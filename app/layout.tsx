@@ -63,6 +63,14 @@ export const metadata: Metadata = {
     description: "Building modern digital experiences with code & AI.",
     images: ["https://seemabali.vercel.app/og-image.jpg"],
   },
+  icons: {
+    icon: [
+      { url: "/icon.jpg", type: "image/jpeg" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/icon.jpg",
+    apple: "/icon.jpg",
+  },
   robots: {
     index: true,
     follow: true,
