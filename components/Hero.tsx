@@ -58,7 +58,7 @@ const Hero: React.FC<HeroProps> = ({ onPreloadComplete, onOpenChat }) => {
 
     const timer = setTimeout(() => {
       frameId = requestAnimationFrame(step);
-    }, 200);
+    }, 400);
 
     return () => {
       clearTimeout(timer);
@@ -82,12 +82,26 @@ const Hero: React.FC<HeroProps> = ({ onPreloadComplete, onOpenChat }) => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 w-full pointer-events-none flex items-center justify-center px-2">
         <motion.h1
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            backgroundPosition: ["0% 50%", "200% 50%"],
+          }}
+          transition={{
+            opacity: { duration: 0.85, ease: [0.16, 1, 0.3, 1] },
+            scale: { duration: 0.85, ease: [0.16, 1, 0.3, 1] },
+            backgroundPosition: {
+              duration: 6,
+              repeat: Infinity,
+              ease: "linear",
+            },
+          }}
           className="text-[17vw] sm:text-[15vw] md:text-[12rem] lg:text-[15rem] xl:text-[17rem] font-black tracking-tighter text-transparent bg-clip-text drop-shadow-[0_15px_45px_rgba(0,0,0,0.9)] leading-none uppercase text-center select-none"
           style={{
-            backgroundImage: `linear-gradient(105deg, #374151 0%, #d1d5db 28%, ${ACCENT} 50%, #d1d5db 72%, #374151 100%)`,
-            backgroundSize: "220% 100%",
+            backgroundImage: `linear-gradient(90deg, #374151 0%, #e2e8f0 20%, ${ACCENT} 50%, #e2e8f0 80%, #374151 100%)`,
+            backgroundSize: "200% 100%",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
         >
           {text}
