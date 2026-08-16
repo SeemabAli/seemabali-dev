@@ -11,16 +11,20 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { portfolioData } from "@/data/portfolioData";
+import SpotlightCard from "@/components/SpotlightCard";
 
 const ACCENT = "#ccff00";
+const ACCENT_RGB = "204,255,0";
 
 export default function Experience() {
   return (
     <section id="experience" className="py-24 relative bg-black overflow-hidden">
-      {/* Background glow */}
-      <div
-        className="absolute top-1/2 right-0 w-80 h-80 rounded-full blur-[140px] pointer-events-none opacity-30"
-        style={{ background: `radial-gradient(circle, ${ACCENT} 0%, transparent 70%)` }}
+      {/* Background ambient glow */}
+      <motion.div
+        className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
+        animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.45, 0.3] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -39,62 +43,68 @@ export default function Experience() {
           </h2>
 
           <p className="text-gray-400 max-w-2xl text-sm sm:text-base leading-relaxed">
-            Hands-on software development in enterprise and agency environments,
-            delivering client-focused web applications and modern frontend solutions.
+            Hands-on software engineering in enterprise and client-facing environments,
+            delivering scalable web applications, Sitecore CMS workflows, and modern UI solutions.
           </p>
         </div>
 
         {/* Timeline Container */}
         <div className="max-w-4xl mx-auto">
-          {portfolioData.experience.map((exp, idx) => (
+          {portfolioData.experience.map((exp) => (
             <motion.div
               key={exp.company}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="relative pl-6 sm:pl-8 border-l-2 border-white/10 space-y-4 group pb-6"
+              className="relative pl-6 sm:pl-8 border-l-2 border-white/10 space-y-4 group pb-8"
             >
-              {/* Timeline Marker */}
+              {/* Timeline Glowing Node */}
               <div
                 className="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-4 border-black group-hover:scale-125 transition-transform duration-300"
-                style={{ backgroundColor: ACCENT, boxShadow: `0 0 12px ${ACCENT}CC` }}
+                style={{ backgroundColor: ACCENT, boxShadow: `0 0 16px ${ACCENT}` }}
               />
 
-              {/* Experience Card */}
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 space-y-6">
+              {/* Experience Spotlight Card */}
+              <SpotlightCard
+                spotlightRgb={ACCENT_RGB}
+                className="rounded-3xl border border-white/10 bg-[#080808] p-6 sm:p-8 space-y-6 hover:border-[#ccff00]/30 transition-all duration-300"
+              >
                 {/* Header Info */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-5">
                   <div>
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span
                         className="px-2.5 py-0.5 rounded-full border text-xs font-mono"
-                        style={{ borderColor: `${ACCENT}33`, backgroundColor: `${ACCENT}0D`, color: ACCENT }}
+                        style={{ borderColor: `${ACCENT}4D`, backgroundColor: `${ACCENT}0D`, color: ACCENT }}
                       >
                         {exp.type}
                       </span>
                       {exp.period.toLowerCase().includes("present") && (
-                        <span className="text-xs font-mono text-gray-400">● Present</span>
+                        <span className="text-xs font-mono text-gray-400 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: ACCENT }} />
+                          Present Role
+                        </span>
                       )}
                     </div>
 
-                    <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
+                    <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                       {exp.role}
                     </h3>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-gray-400 mt-1">
-                      <span className="flex items-center gap-1 text-gray-300">
+                    <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-gray-400 mt-1.5">
+                      <span className="flex items-center gap-1.5 text-gray-200">
                         <Building className="w-3.5 h-3.5" style={{ color: ACCENT }} />
                         {exp.company}
                       </span>
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-gray-400">
                         <MapPin className="w-3.5 h-3.5 text-gray-500" />
                         {exp.location}
                       </span>
                     </div>
                   </div>
 
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono text-gray-300 w-fit">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs font-mono text-gray-300 w-fit shrink-0">
                     <Calendar className="w-3.5 h-3.5" style={{ color: ACCENT }} />
                     <span>{exp.period}</span>
                   </div>
@@ -107,10 +117,11 @@ export default function Experience() {
 
                 {/* Key Responsibilities */}
                 <div className="space-y-2.5">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono flex items-center gap-2">
+                    <span className="w-1 h-3 rounded-full" style={{ backgroundColor: ACCENT }} />
                     Key Contributions & Development Scope
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 pt-1">
                     {exp.responsibilities.map((resp, i) => (
                       <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-300">
                         <CheckCircle2
@@ -127,7 +138,7 @@ export default function Experience() {
                 {exp.impactPoints && exp.impactPoints.length > 0 && (
                   <div
                     className="p-4 rounded-2xl border space-y-2"
-                    style={{ borderColor: `${ACCENT}33`, backgroundColor: `${ACCENT}0D` }}
+                    style={{ borderColor: `${ACCENT}33`, backgroundColor: `${ACCENT}08` }}
                   >
                     <div
                       className="flex items-center gap-1.5 text-xs font-bold font-mono"
@@ -140,7 +151,7 @@ export default function Experience() {
                       {exp.impactPoints.map((impact, k) => (
                         <div
                           key={k}
-                          className="text-xs text-gray-300 bg-black/40 p-2.5 rounded-xl border border-white/5"
+                          className="text-xs text-gray-300 bg-black/60 p-2.5 rounded-xl border border-white/5"
                         >
                           {impact}
                         </div>
@@ -150,17 +161,17 @@ export default function Experience() {
                 )}
 
                 {/* Tech Badges */}
-                <div className="pt-2 flex flex-wrap gap-2">
+                <div className="pt-2 flex flex-wrap gap-1.5">
                   {exp.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className="px-2.5 py-1 rounded-lg bg-black/60 border border-white/10 text-xs font-mono text-gray-300"
+                      className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/10 text-xs font-mono text-gray-300"
                     >
                       {tech}
                     </span>
                   ))}
                 </div>
-              </div>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>

@@ -3,13 +3,21 @@ export interface Project {
   title: string;
   tagline: string;
   description: string;
-  longDescription: string;
-  category: "AI & Full-Stack" | "Full-Stack Web" | "Enterprise Systems";
+  /** Optional — falls back to `description` in the UI if not provided. */
+  longDescription?: string;
+  category:
+  | "AI & Full-Stack"
+  | "Full-Stack Web"
+  | "Enterprise Systems"
+  | "NextJS & Database Application";
   technologies: string[];
   features: string[];
   metrics?: { label: string; value: string }[];
   githubUrl: string;
-  liveUrl: string;
+  /** Optional — not every project has a deployed demo yet. Projects/ProjectModal
+   *  both hide the "Live Demo" button when this is missing rather than
+   *  rendering a broken link. */
+  liveUrl?: string;
   featured: boolean;
   accentColor: string; // Tailwind gradient or hex
   badgeText: string;
@@ -93,7 +101,7 @@ export const portfolioData = {
     email: "seemabali@proton.me",
     github: "https://github.com/seemabali",
     linkedin: "https://linkedin.com/in/seemabali7335",
-    resumeUrl: "#contact",
+    resumeUrl: "/files/Seemab_MERN.pdf",
     heroPhoto: "/images/hero-portrait.png",
     stats: [
       { value: "10+", label: "Projects Completed", sub: "Production & Academic" },
@@ -273,15 +281,11 @@ export const portfolioData = {
       id: "bari-arabians",
       title: "Bari-Arabians Stud Farm",
       tagline: "Full-Stack Horse Listing Platform",
-      description:
-        "It is a horse listing platform built with NextJS and PostgreSQL",
+      description: "It is a horse listing platform built with NextJS and PostgreSQL",
+      longDescription:
+        "A full-stack platform for a working stud farm to list and manage horses online. Built with Next.js and PostgreSQL via Prisma, it handles authenticated user access, pedigree and lineage tracking, and detailed per-horse specification pages, replacing what was previously an offline paper-based catalog.",
       category: "NextJS & Database Application",
-      technologies: [
-        "NextJS",
-        "Tailwind CSS",
-        "PostgreSQL",
-        "Prisma",
-      ],
+      technologies: ["NextJS", "Tailwind CSS", "PostgreSQL", "Prisma"],
       features: [
         "User authentication and authorization",
         "Horse listing and display",

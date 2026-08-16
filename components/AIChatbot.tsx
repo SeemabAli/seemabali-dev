@@ -11,6 +11,7 @@ import {
   User,
   Copy,
   Check,
+  Minimize2,
 } from "lucide-react";
 import { portfolioData } from "@/data/portfolioData";
 
@@ -33,7 +34,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
     {
       id: "welcome-1",
       role: "assistant",
-      content: `Hello! I am **${portfolioData.chatbot.name}**, ${portfolioData.personal.name}'s official portfolio assistant. How can I help you explore his skills, projects, experience, or availability today?`,
+      content: `Hello! I am **${portfolioData.chatbot.name}**, ${portfolioData.personal.name}'s portfolio AI assistant. How can I help you explore his skills, projects, work experience, or availability today?`,
       timestamp: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -43,10 +44,29 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isPastHero, setIsPastHero] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const suggestedQuestions = portfolioData.chatbot.suggestedQuestions;
+
+  // Track if user has scrolled past the hero banner
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroElement = document.getElementById("hero");
+      if (heroElement) {
+        const heroBottom = heroElement.getBoundingClientRect().bottom;
+        // Show floating button when hero banner is ending/ended (or past 200px)
+        setIsPastHero(heroBottom <= 200);
+      } else {
+        setIsPastHero(window.scrollY > 300);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,17 +78,6 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
       setTimeout(() => inputRef.current?.focus(), 150);
     }
   }, [isOpen, messages]);
-
-  // Lock page scroll while the chat panel is open on mobile, same pattern
-  // used by the project modal, so the page behind doesn't scroll with it.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.innerWidth >= 640) return; // desktop panel is small/fixed, no lock needed
-    document.body.style.overflow = isOpen ? "hidden" : "auto";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen]);
 
   const handleSendMessage = async (textToSend?: string) => {
     const messageText = (textToSend || inputValue).trim();
@@ -139,7 +148,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
       {
         id: "welcome-reset",
         role: "assistant",
-        content: `Chat cleared! Ask me anything about ${portfolioData.personal.name}'s background, projects, skills, or get in touch for opportunities.`,
+        content: `Chat cleared! Ask me anything about ${portfolioData.personal.name}'s background, engineering projects, tech stack, or full-time opportunities.`,
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -159,7 +168,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
     const boldFormatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
     const linkFormatted = boldFormatted.replace(
       /\[(.*?)\]\((.*?)\)/g,
-      `<a href="$2" target="_blank" rel="noopener noreferrer" class="underline hover:opacity-80" style="color:${ACCENT}">$1</a>`
+      `<a href="$2" target="_blank" rel="noopener noreferrer" class="underline hover:opacity-80 font-medium" style="color:${ACCENT}">$1</a>`
     );
     const lines = linkFormatted.split("\n");
     return (
@@ -169,7 +178,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
           if (line.trim().startsWith("- ") || line.trim().startsWith("• ")) {
             return (
               <div key={idx} className="flex items-start gap-1.5 pl-1">
-                <span className="mt-1 shrink-0" style={{ color: ACCENT }}>
+                <span className="mt-0.5 shrink-0 font-bold" style={{ color: ACCENT }}>
                   ›
                 </span>
                 <span
@@ -194,68 +203,77 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
 
   return (
     <>
-      {/* Floating Trigger Button */}
-      <div className="fixed bottom-6 right-6 z-40">
-        <div className="relative group">
-          {/* Tooltip */}
-          {!isOpen && (
-            <div
-              className="absolute right-full mr-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black border text-xs font-medium shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-              style={{ borderColor: `${ACCENT}4D`, color: ACCENT }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Ask my AI assistant</span>
-            </div>
-          )}
-
-          {/* Floating Pill / Spark Button */}
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label="Open AI Assistant"
-            className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-black border text-white hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-none"
-            style={{
-              borderColor: `${ACCENT}66`,
-              boxShadow: `0 0 25px ${ACCENT}33`,
-            }}
+      {/* Floating Trigger Button (Shown once hero banner has ended or when chat is open) */}
+      <AnimatePresence>
+        {(isPastHero || isOpen) && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.7, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.7, y: 20 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="fixed bottom-5 right-5 z-[60]"
           >
-            <span
-              className="absolute -inset-1 rounded-2xl opacity-40 blur-sm group-hover:opacity-80 transition duration-300"
-              style={{ backgroundColor: `${ACCENT}33` }}
-            />
-            <div className="relative z-10 flex items-center justify-center">
-              {isOpen ? (
-                <X className="w-6 h-6 text-white" />
-              ) : (
-                <Sparkles className="w-6 h-6 animate-pulse" style={{ color: ACCENT }} />
+            <div className="relative group">
+              {/* Hover Tooltip */}
+              {!isOpen && (
+                <div
+                  className="absolute right-full mr-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/90 backdrop-blur-md border text-xs font-mono shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all pointer-events-none"
+                  style={{ borderColor: `${ACCENT}4D`, color: ACCENT }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Ask AI Assistant</span>
+                </div>
               )}
-            </div>
-          </button>
-        </div>
-      </div>
 
-      {/* Slide-Up Chat Panel */}
+              {/* Floating Pill / Spark Button */}
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-label="Toggle AI Assistant"
+                className="relative flex items-center justify-center w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-[#080808] border text-white hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-none shadow-[0_0_20px_rgba(204,255,0,0.25)]"
+                style={{
+                  borderColor: isOpen ? "#ffffff33" : `${ACCENT}66`,
+                }}
+              >
+                <span
+                  className="absolute -inset-1 rounded-2xl opacity-40 blur-sm group-hover:opacity-80 transition duration-300 pointer-events-none"
+                  style={{ backgroundColor: `${ACCENT}22` }}
+                />
+                <div className="relative z-10 flex items-center justify-center">
+                  {isOpen ? (
+                    <X className="w-5 h-5 text-gray-300 hover:text-white transition-colors" />
+                  ) : (
+                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" style={{ color: ACCENT }} />
+                  )}
+                </div>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Chat Card (Z-index 60: sits above navbar and content) */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          <motion.aside
+            initial={{ opacity: 0, y: 25, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.95 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-24 right-4 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-[420px] max-h-[600px] h-[82vh] rounded-3xl bg-black/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden"
+            exit={{ opacity: 0, y: 25, scale: 0.96 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="fixed bottom-20 sm:bottom-22 right-3 sm:right-6 z-[60] w-[calc(100vw-1.5rem)] sm:w-[410px] max-h-[calc(100dvh-6.5rem)] sm:max-h-[580px] h-[75vh] rounded-3xl bg-[#080808]/98 backdrop-blur-2xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="px-5 py-4 bg-white/[0.03] border-b border-white/[0.08] flex items-center justify-between">
+            {/* Chat Header */}
+            <div className="px-4 py-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div
-                    className="w-10 h-10 rounded-2xl border flex items-center justify-center"
+                    className="w-9 h-9 rounded-xl border flex items-center justify-center shadow-[0_0_12px_rgba(204,255,0,0.2)]"
                     style={{ borderColor: `${ACCENT}4D`, backgroundColor: `${ACCENT}12`, color: ACCENT }}
                   >
-                    <Bot className="w-5 h-5" />
+                    <Bot className="w-4 h-4" />
                   </div>
                   <span
-                    className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-black animate-pulse"
+                    className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-black animate-pulse shadow-[0_0_6px_#ccff00]"
                     style={{ backgroundColor: ACCENT }}
                   />
                 </div>
@@ -266,62 +284,64 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                       {portfolioData.chatbot.name}
                     </h3>
                     <span
-                      className="text-[10px] font-mono px-1.5 py-0.5 rounded border"
-                      style={{ borderColor: `${ACCENT}33`, color: ACCENT }}
+                      className="text-[9px] font-mono px-1.5 py-0.2 rounded border"
+                      style={{ borderColor: `${ACCENT}4D`, color: ACCENT, backgroundColor: `${ACCENT}0D` }}
                     >
-                      AI Ready
+                      AI Online
                     </span>
                   </div>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-gray-400">
                     {portfolioData.chatbot.subtitle}
                   </p>
                 </div>
               </div>
 
-              {/* Header Actions */}
+              {/* Header Action Buttons */}
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={handleClearChat}
-                  className="p-2 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
                   title="Clear conversation"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
 
                 <button
                   type="button"
                   onClick={onToggle}
-                  className="p-2 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
-                  title="Close chat"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  title="Minimize chat"
                 >
-                  <X className="w-4 h-4" />
+                  <Minimize2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
             {/* Messages Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs sm:text-sm [scrollbar-width:thin] [scrollbar-color:#333_transparent]">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex gap-2.5 ${message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  className={`flex gap-2.5 ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   {message.role === "assistant" && (
                     <div
-                      className="w-7 h-7 rounded-xl border flex items-center justify-center shrink-0 mt-1"
+                      className="w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 mt-0.5"
                       style={{ borderColor: `${ACCENT}4D`, backgroundColor: `${ACCENT}12`, color: ACCENT }}
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Sparkles className="w-3 h-3" />
                     </div>
                   )}
 
                   <div
-                    className={`relative max-w-[82%] rounded-2xl p-3.5 group ${message.role === "user"
-                        ? "text-black rounded-br-none font-medium"
-                        : "bg-white/[0.05] border border-white/10 text-gray-200 rounded-bl-none"
-                      }`}
+                    className={`relative max-w-[84%] rounded-2xl p-3.5 group shadow-sm ${
+                      message.role === "user"
+                        ? "text-black rounded-tr-none font-semibold shadow-[0_0_15px_rgba(204,255,0,0.15)]"
+                        : "bg-white/[0.04] border border-white/10 text-gray-200 rounded-tl-none"
+                    }`}
                     style={
                       message.role === "user" ? { backgroundColor: ACCENT } : undefined
                     }
@@ -329,14 +349,15 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                     {message.role === "assistant" ? (
                       formatMarkdown(message.content)
                     ) : (
-                      <p className="break-words leading-relaxed">{message.content}</p>
+                      <p className="break-words leading-relaxed text-xs sm:text-sm">{message.content}</p>
                     )}
 
                     <div
-                      className={`flex items-center justify-between gap-2 mt-2 pt-1 border-t text-[10px] ${message.role === "user"
-                          ? "border-black/10 text-black/60"
-                          : "border-white/5 text-gray-500"
-                        }`}
+                      className={`flex items-center justify-between gap-2 mt-2 pt-1 border-t text-[10px] ${
+                        message.role === "user"
+                          ? "border-black/15 text-black/60 font-mono"
+                          : "border-white/5 text-gray-500 font-mono"
+                      }`}
                     >
                       <span>{message.timestamp}</span>
 
@@ -358,8 +379,8 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                   </div>
 
                   {message.role === "user" && (
-                    <div className="w-7 h-7 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-gray-300 shrink-0 mt-1">
-                      <User className="w-3.5 h-3.5" />
+                    <div className="w-6 h-6 rounded-lg bg-white/[0.06] border border-white/10 flex items-center justify-center text-gray-300 shrink-0 mt-0.5">
+                      <User className="w-3 h-3" />
                     </div>
                   )}
                 </div>
@@ -367,14 +388,14 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
 
               {/* Typing Indicator */}
               {isLoading && (
-                <div className="flex items-center gap-2.5 text-gray-500">
+                <div className="flex items-center gap-2.5 text-gray-400">
                   <div
-                    className="w-7 h-7 rounded-xl border flex items-center justify-center shrink-0"
+                    className="w-6 h-6 rounded-lg border flex items-center justify-center shrink-0"
                     style={{ borderColor: `${ACCENT}4D`, backgroundColor: `${ACCENT}12`, color: ACCENT }}
                   >
-                    <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                    <Sparkles className="w-3 h-3 animate-spin" />
                   </div>
-                  <div className="bg-white/[0.05] border border-white/10 px-3 py-2 rounded-2xl rounded-bl-none flex items-center gap-1.5">
+                  <div className="bg-white/[0.04] border border-white/10 px-3 py-2 rounded-2xl rounded-tl-none flex items-center gap-1.5">
                     <span
                       className="w-1.5 h-1.5 rounded-full animate-bounce"
                       style={{ backgroundColor: ACCENT }}
@@ -394,16 +415,16 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Suggested Prompt Chips */}
-            <div className="px-4 py-2 border-t border-white/[0.06] bg-white/[0.02]">
-              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+            {/* Suggested Question Chips */}
+            <div className="px-3.5 py-2 border-t border-white/[0.06] bg-white/[0.01]">
+              <div className="flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden text-[11px]">
                 {suggestedQuestions.map((q) => (
                   <button
                     key={q}
                     type="button"
                     onClick={() => handleSendMessage(q)}
                     disabled={isLoading}
-                    className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white transition-colors shrink-0 disabled:opacity-50"
+                    className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-[#ccff00]/40 text-gray-300 hover:text-[#ccff00] transition-colors shrink-0 disabled:opacity-50 text-[11px]"
                   >
                     {q}
                   </button>
@@ -417,28 +438,28 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                 e.preventDefault();
                 handleSendMessage();
               }}
-              className="p-3 bg-white/[0.03] border-t border-white/[0.08] flex items-center gap-2"
+              className="p-3 bg-white/[0.02] border-t border-white/[0.08] flex items-center gap-2"
             >
               <input
                 ref={inputRef}
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about skills, projects, experience..."
+                placeholder="Ask about Seemab's projects, skills..."
                 disabled={isLoading}
-                className="flex-1 bg-black/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#ccff00] transition-colors disabled:opacity-50"
+                className="flex-1 bg-black/70 border border-white/10 focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 outline-none transition-colors disabled:opacity-50"
               />
 
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className="p-2.5 rounded-xl text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                className="p-2.5 rounded-xl text-black font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 disabled:cursor-not-allowed shrink-0 shadow-[0_0_12px_rgba(204,255,0,0.3)]"
                 style={{ backgroundColor: ACCENT }}
               >
                 <Send className="w-4 h-4" />
               </button>
             </form>
-          </motion.div>
+          </motion.aside>
         )}
       </AnimatePresence>
     </>

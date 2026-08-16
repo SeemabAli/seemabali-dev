@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { X, CheckCircle2, Sparkles, ArrowUpRight } from "lucide-react";
+import { X, CheckCircle2, Sparkles } from "lucide-react";
 import { GithubIcon } from "@/components/icons/SocialIcons";
 import { Project } from "@/data/portfolioData";
 
@@ -96,7 +96,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
               System Architecture & Overview
             </h4>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
-              {project.longDescription}
+              {project.longDescription ?? project.description}
             </p>
           </div>
 
@@ -158,27 +158,18 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
             </div>
           </div>
 
-          {/* Action CTAs */}
+          {/* Action CTA — source code is the only action now that Live
+              Demo has been removed, so it gets the primary treatment. */}
           <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-white/10">
             <a
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-black transition-transform hover:scale-[1.03]"
+              style={{ backgroundColor: ACCENT }}
             >
               <GithubIcon className="w-4 h-4" />
               <span>View Source Code</span>
-            </a>
-
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-black transition-transform hover:scale-[1.03]"
-              style={{ backgroundColor: ACCENT }}
-            >
-              <span>Launch Live Demo</span>
-              <ArrowUpRight className="w-4 h-4" />
             </a>
           </div>
         </motion.div>

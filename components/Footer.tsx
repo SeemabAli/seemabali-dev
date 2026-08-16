@@ -23,7 +23,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t border-white/[0.08] bg-black relative z-10 pt-16 pb-12">
+    <footer className="border-t border-white/[0.08] bg-[#050505] relative z-10 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Row */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-12 border-b border-white/[0.06] items-start">
@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="md:col-span-5 space-y-3">
             <div className="flex items-center gap-2.5">
               <div
-                className="w-9 h-9 rounded-xl border flex items-center justify-center"
+                className="w-9 h-9 rounded-xl border flex items-center justify-center shadow-[0_0_15px_rgba(204,255,0,0.15)]"
                 style={{ borderColor: `${ACCENT}4D`, backgroundColor: `${ACCENT}12`, color: ACCENT }}
               >
                 <Code2 className="w-4 h-4" />
@@ -47,7 +47,7 @@ export default function Footer() {
             </p>
 
             <div className="flex items-center gap-2 text-xs font-mono pt-1" style={{ color: ACCENT }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: ACCENT }} />
+              <span className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_#ccff00]" style={{ backgroundColor: ACCENT }} />
               <span>{portfolioData.personal.badge ?? "Available for opportunities"}</span>
             </div>
           </div>
@@ -62,9 +62,9 @@ export default function Footer() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="hover:text-white transition-colors py-1 flex items-center gap-1"
+                  className="hover:text-white transition-colors py-1 flex items-center gap-1 group"
                 >
-                  <span style={{ color: ACCENT }}>›</span>
+                  <span className="transition-transform group-hover:translate-x-0.5" style={{ color: ACCENT }}>›</span>
                   <span>{link.label}</span>
                 </a>
               ))}
@@ -83,7 +83,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="GitHub Profile"
-                  className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 hover:text-black hover:bg-white transition-colors"
+                  className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 hover:text-black hover:bg-[#ccff00] hover:border-[#ccff00] transition-all duration-200"
                 >
                   <GithubIcon className="w-4 h-4" />
                 </a>
@@ -93,7 +93,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn Profile"
-                  className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 hover:text-black hover:bg-white transition-colors"
+                  className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 hover:text-black hover:bg-[#ccff00] hover:border-[#ccff00] transition-all duration-200"
                 >
                   <LinkedinIcon className="w-4 h-4" />
                 </a>
@@ -101,7 +101,7 @@ export default function Footer() {
                 <a
                   href={`mailto:${portfolioData.personal.email}`}
                   aria-label={`Email ${portfolioData.personal.name.split(" ")[0]}`}
-                  className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 hover:text-black hover:bg-white transition-colors"
+                  className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 hover:text-black hover:bg-[#ccff00] hover:border-[#ccff00] transition-all duration-200"
                 >
                   <Mail className="w-4 h-4" />
                 </a>
@@ -111,7 +111,7 @@ export default function Footer() {
             <button
               type="button"
               onClick={scrollToTop}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/10 text-xs font-mono text-gray-300 hover:text-white transition-colors self-start sm:self-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] hover:bg-[#ccff00]/10 hover:border-[#ccff00]/50 hover:text-[#ccff00] border border-white/10 text-xs font-mono text-gray-300 transition-all duration-200 self-start sm:self-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
             >
               <ArrowUp className="w-3.5 h-3.5" style={{ color: ACCENT }} />
               <span>Back to Top</span>

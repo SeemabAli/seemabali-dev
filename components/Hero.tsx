@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import gsap from "gsap";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Sparkles, ChevronDown } from "lucide-react";
 import { portfolioData } from "@/data/portfolioData";
 import centerImage from "../public/Images/portfolioImage2.png";
 
 interface HeroProps {
-  /** Called once the intro (scramble + slide-up) animation finishes,
-   *  so a parent layout can unlock the rest of the page. */
   onPreloadComplete?: () => void;
   onOpenChat?: () => void;
 }
@@ -23,262 +23,201 @@ function splitRole(role: string): [string, string] {
 
 const Hero: React.FC<HeroProps> = ({ onPreloadComplete, onOpenChat }) => {
   const [text, setText] = useState(START_WORD);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLHeadingElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const buttonsRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
 
   const [roleBold, roleItalic] = splitRole(
     portfolioData.personal.role ?? "Software Developer"
   );
 
-  // Continuous lime glow sweeping behind the portrait, left <-> right.
-  // Runs the whole time — it's simply hidden until the image slides into
-  // view, so it already looks "live" the moment it appears.
+  // Smooth, non-blocking letter morph using requestAnimationFrame
   useEffect(() => {
-    if (!glowRef.current) return;
+    let frameId: number;
+    let start: number | null = null;
+    const duration = 650; // ms
 
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const step = (timestamp: number) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      const revealedLength = Math.floor(progress * TARGET_WORD.length);
 
-    if (reduceMotion) return;
+      const newText = TARGET_WORD.split("")
+        .map((letter, i) => {
+          if (i < revealedLength) return TARGET_WORD[i];
+          if (i < START_WORD.length) return START_WORD[i];
+          return "";
+        })
+        .join("");
 
-    gsap.set(glowRef.current, { left: "-15%" });
-    const glowTween = gsap.to(glowRef.current, {
-      left: "75%",
-      duration: 5,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
+      setText(newText);
 
-    return () => {
-      glowTween.kill();
-    };
-  }, []);
-
-  useEffect(() => {
-    // Lock scroll during the intro animation
-    window.scrollTo(0, 0);
-    document.body.style.overflow = "hidden";
-
-    let iterations = 0;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-    let isMounted = true;
-
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const imageSrc =
-      typeof centerImage === "string" ? centerImage : (centerImage as { src: string }).src;
-
-    const imageLoadPromise = new Promise<void>((resolve) => {
-      const img = new window.Image();
-      img.src = imageSrc;
-      if (img.complete) {
-        resolve();
+      if (progress < 1) {
+        frameId = requestAnimationFrame(step);
       } else {
-        img.onload = () => resolve();
-        img.onerror = () => resolve();
+        onPreloadComplete?.();
       }
-    });
+    };
 
-    const delayPromise = new Promise<void>((resolve) => {
-      timeoutId = setTimeout(resolve, 1000);
-    });
-
-    Promise.all([imageLoadPromise, delayPromise]).then(() => {
-      if (!isMounted) return;
-
-      intervalId = setInterval(() => {
-        setText(() => {
-          return TARGET_WORD.split("")
-            .map((letter, index) => {
-              if (index < Math.floor(iterations)) {
-                return TARGET_WORD[index]; // Target letter
-              }
-              if (index < START_WORD.length) {
-                return START_WORD[index]; // Original letter
-              }
-              return "";
-            })
-            .join("");
-        });
-
-        if (iterations >= TARGET_WORD.length) {
-          if (intervalId) clearInterval(intervalId);
-
-          const tl = gsap.timeline({
-            onComplete: () => {
-              document.body.style.overflow = "auto";
-              onPreloadComplete?.();
-            },
-          });
-
-          const isMobile = window.innerWidth < 768;
-
-          // 1. Move the central text container up to its resting place
-          tl.to(
-            containerRef.current,
-            {
-              top: isMobile ? "20%" : "45%",
-              duration: 1.5,
-              ease: "power3.inOut",
-            },
-            "+=0.2"
-          );
-
-          // 2. Fade + slide up the subtitle and buttons
-          tl.fromTo(
-            [subtitleRef.current, buttonsRef.current],
-            { y: 50, opacity: 0 },
-            { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: "power3.out" },
-            "-=1.0"
-          );
-
-          // 3. Slide the portrait up into place
-          tl.fromTo(
-            imageRef.current,
-            { y: "100vh" },
-            { y: 0, duration: 1.5, ease: "power3.out" },
-            "-=1.2"
-          );
-
-          // 4. Once settled, start the lime shimmer sweeping through the
-          // wordmark on a loop. Kicked off outside the timeline (via
-          // tl.call) rather than as a tween inside it, since an infinite
-          // tween inside the timeline would mean the timeline itself
-          // never completes — which would silently break the scroll
-          // unlock / onPreloadComplete callback above.
-          if (!reduceMotion) {
-            tl.call(
-              () => {
-                if (!textRef.current) return;
-                gsap.set(textRef.current, { backgroundPosition: "200% 0%" });
-                gsap.to(textRef.current, {
-                  backgroundPosition: "-50% 0%",
-                  duration: 4.5,
-                  repeat: -1,
-                  ease: "sine.inOut",
-                  yoyo: true,
-                });
-              },
-              [],
-              "-=0.3"
-            );
-          }
-        }
-        iterations += 1 / 3; // Controls the speed of the letter swap
-      }, 50);
-    });
+    const timer = setTimeout(() => {
+      frameId = requestAnimationFrame(step);
+    }, 200);
 
     return () => {
-      isMounted = false;
-      document.body.style.overflow = "auto";
-      if (timeoutId) clearTimeout(timeoutId);
-      if (intervalId) clearInterval(intervalId);
+      clearTimeout(timer);
+      cancelAnimationFrame(frameId);
     };
   }, [onPreloadComplete]);
+
+  const handleScrollCueClick = () => {
+    document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-end justify-center bg-cover bg-center bg-no-repeat overflow-hidden"
-      style={{ background: "radial-gradient(circle, #222222 0%, #000000 80%)" }}
+      className="relative h-[100dvh] min-h-[580px] flex items-end justify-center bg-black overflow-hidden select-none"
+      style={{
+        background: "radial-gradient(circle at 50% 50%, #151a0d 0%, #000000 85%)",
+      }}
     >
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+      {/* Ambient background grid pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none" />
 
-      <div
-        ref={containerRef}
-        className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none flex flex-col items-start w-max"
-      >
-        <h1
-          ref={textRef}
-          className="text-[16vw] md:text-[10rem] lg:text-[14rem] font-black tracking-tighter text-transparent bg-clip-text drop-shadow-2xl pr-4 md:pr-8 leading-none uppercase"
+      {/* 1. PORTFOLIO Wordmark in the EXACT Center of the Hero Section */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 w-full pointer-events-none flex items-center justify-center px-2">
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="text-[17vw] sm:text-[15vw] md:text-[12rem] lg:text-[15rem] xl:text-[17rem] font-black tracking-tighter text-transparent bg-clip-text drop-shadow-[0_15px_45px_rgba(0,0,0,0.9)] leading-none uppercase text-center select-none"
           style={{
-            backgroundImage: `linear-gradient(100deg, #4b5563 0%, #e5e7eb 35%, ${ACCENT} 50%, #e5e7eb 65%, #4b5563 100%)`,
-            backgroundSize: "250% 100%",
-            backgroundPosition: "200% 0%",
+            backgroundImage: `linear-gradient(105deg, #374151 0%, #d1d5db 28%, ${ACCENT} 50%, #d1d5db 72%, #374151 100%)`,
+            backgroundSize: "220% 100%",
           }}
         >
           {text}
-        </h1>
-
-        <p
-          ref={subtitleRef}
-          className="absolute -bottom-8 left-1/2 -translate-x-1/2 md:translate-x-0 md:-bottom-12 md:left-8 text-white text-base md:text-2xl lg:text-4xl drop-shadow-md z-10 opacity-0 w-max"
-        >
-          <span className="font-bold">{roleBold}</span>{" "}
-          <span className="font-light italic text-gray-300">{roleItalic}</span>
-        </p>
-
-        <div
-          ref={buttonsRef}
-          className="absolute -bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:-bottom-12 md:left-auto md:right-20 flex items-center gap-2 md:gap-4 pointer-events-auto z-10 opacity-0 w-max"
-        >
-          <a
-            href="#contact"
-            className="group w-8 h-8 md:w-12 md:h-12 rounded-full border border-gray-400/30 flex items-center justify-center backdrop-blur-md bg-black/20 hover:bg-white/10 hover:border-gray-400/50 transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
-          >
-            <svg
-              className="w-3 h-3 md:w-4 md:h-4 text-gray-300 transition-transform duration-300 group-hover:rotate-45"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 7L7 17M7 17H16M7 17V8" />
-            </svg>
-          </a>
-
-          <a
-            href="#contact"
-            className="px-4 py-1.5 md:px-6 md:py-2.5 rounded-full border border-gray-400/30 flex items-center justify-center backdrop-blur-md bg-black/20 hover:bg-white/10 hover:border-gray-400/50 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
-          >
-            <span className="text-gray-300 text-xs md:text-base italic font-light tracking-wider">
-              Contact
-            </span>
-          </a>
-
-          {onOpenChat && (
-            <button
-              type="button"
-              onClick={onOpenChat}
-              className="px-4 py-1.5 md:px-6 md:py-2.5 rounded-full border border-[#ccff00]/40 flex items-center justify-center backdrop-blur-md bg-[#ccff00]/10 hover:bg-[#ccff00]/20 text-[#ccff00] transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
-            >
-              <span className="text-xs md:text-base font-semibold tracking-wider flex items-center gap-1.5">
-                ✦ Ask AI
-              </span>
-            </button>
-          )}
-        </div>
+        </motion.h1>
       </div>
 
-      <div
-        ref={imageRef}
-        className="relative z-10 text-center text-white flex flex-col items-center w-full pointer-events-none translate-y-[100vh]"
+      {/* 2. Portrait Graphic: Starts under the navbar and ends cleanly at hero bottom */}
+      <motion.div
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full h-[calc(100dvh-4.5rem)] sm:h-[calc(100dvh-5rem)] flex items-end justify-center pointer-events-none"
       >
-        {/* Animated glow sweeping behind the portrait */}
-        <div
-          ref={glowRef}
+        {/* Sweeping Neon Glow Behind Portrait */}
+        <motion.div
           aria-hidden="true"
-          className="absolute top-1/2 -translate-y-1/2 z-0 w-2/3 max-w-xs aspect-square rounded-full blur-3xl opacity-70"
+          className="absolute top-1/2 -translate-y-1/2 z-0 w-80 sm:w-[480px] md:w-[600px] aspect-square rounded-full blur-3xl opacity-60 pointer-events-none"
           style={{
-            background: `radial-gradient(circle, ${ACCENT}80 0%, ${ACCENT}30 45%, transparent 75%)`,
+            background: `radial-gradient(circle, ${ACCENT}85 0%, ${ACCENT}25 45%, transparent 75%)`,
+          }}
+          animate={{
+            x: ["-16%", "16%", "-16%"],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 6.5,
+            repeat: Infinity,
+            ease: "easeInOut",
           }}
         />
 
-        <img
-          src={typeof centerImage === "string" ? centerImage : centerImage.src}
-          alt="Hero portrait graphic"
-          className="relative z-10 w-full max-w-md object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-        />
+        {/* Large Portrait Image Spanning Below Navbar to Hero Bottom */}
+        <div className="relative z-10 w-full h-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[660px] flex items-end justify-center">
+          <Image
+            src={centerImage}
+            alt="Seemab Ali - Full-Stack Developer"
+            priority={true}
+            fetchPriority="high"
+            quality={95}
+            sizes="(max-width: 640px) 340px, (max-width: 768px) 460px, (max-width: 1024px) 560px, 660px"
+            className="w-full h-full object-contain object-bottom drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] filter contrast-[1.03]"
+          />
+        </div>
+      </motion.div>
+
+      {/* 3. Mobile Header (Seemab Ali + Role & CTA under navbar) */}
+      <div className="md:hidden absolute top-18 sm:top-20 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center text-center gap-1.5 pointer-events-auto w-full px-4">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="flex flex-col items-center"
+        >
+          <span className="text-sm font-bold text-white tracking-tight">{portfolioData.personal.name}</span>
+          <span className="text-xs text-gray-300">
+            {roleBold} <span className="italic" style={{ color: ACCENT }}>{roleItalic}</span>
+          </span>
+        </motion.div>
+
+        {onOpenChat && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            type="button"
+            onClick={onOpenChat}
+            className="mt-0.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-black font-bold text-[11px] tracking-wide shadow-[0_0_20px_rgba(204,255,0,0.4)] active:scale-95 transition-transform"
+            style={{ backgroundColor: ACCENT }}
+          >
+            <Sparkles className="w-3 h-3" />
+            <span>Ask AI About Me</span>
+          </motion.button>
+        )}
       </div>
+
+      {/* 4. Desktop / Tablet Details (Bottom Left) */}
+      <motion.div
+        initial={{ opacity: 0, x: -25 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="hidden md:flex absolute bottom-8 lg:bottom-10 left-6 lg:left-12 z-20 flex-col items-start gap-1 pointer-events-auto"
+      >
+        <h2 className="text-2xl lg:text-3xl text-white font-black tracking-tight drop-shadow-md">
+          {portfolioData.personal.name}
+        </h2>
+        <p className="text-sm lg:text-base font-medium text-gray-300 drop-shadow-md">
+          <span className="font-bold text-white">{roleBold}</span>{" "}
+          <span className="font-light italic" style={{ color: ACCENT }}>{roleItalic}</span>
+        </p>
+      </motion.div>
+
+      {/* 5. Desktop / Tablet "Ask AI About Me" CTA (Bottom Right) */}
+      {onOpenChat && (
+        <motion.div
+          initial={{ opacity: 0, x: 25 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          className="hidden md:flex absolute bottom-8 lg:bottom-10 right-6 lg:right-12 z-20 pointer-events-auto"
+        >
+          <button
+            type="button"
+            onClick={onOpenChat}
+            className="group inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-black font-bold text-sm tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(204,255,0,0.35)] hover:shadow-[0_0_40px_rgba(204,255,0,0.65)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00]"
+            style={{ backgroundColor: ACCENT }}
+          >
+            <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+            <span>Ask AI About Me</span>
+          </button>
+        </motion.div>
+      )}
+
+      {/* 6. Centered Scroll Down Cue (Bottom Center) */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        onClick={handleScrollCueClick}
+        className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-0.5 cursor-pointer group pointer-events-auto"
+      >
+        <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-gray-400 group-hover:text-white transition-colors">
+          Scroll
+        </span>
+        <ChevronDown
+          className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-bounce transition-transform group-hover:translate-y-0.5"
+          style={{ color: ACCENT }}
+        />
+      </motion.div>
     </section>
   );
 };

@@ -129,7 +129,7 @@ export default function Skills() {
             >
               <SpotlightCard
                 spotlightRgb={ACCENT_RGB}
-                className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 hover:border-white/25 transition-colors duration-300"
+                className="rounded-3xl border border-white/10 bg-[#080808] p-6 sm:p-8 hover:border-[#ccff00]/30 transition-all duration-300"
               >
                 {/* Category Header */}
                 <div className="flex items-center gap-3 mb-4">
