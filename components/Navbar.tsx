@@ -1,47 +1,42 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 const ACCENT = "#ccff00";
 
 // label is what's displayed; id is the actual section id on the page.
 // Kept as separate fields on purpose — "Home" displays as Home but the
 // hero section's real id is "hero", and "Project" points at the
-// "projects" section, so a naive `#${label.toLowerCase()}` (what the
-// previous version did) silently pointed most links nowhere.
+// "projects" section, so a naive `#${label.toLowerCase()}` (what an
+// earlier version did) silently pointed most links nowhere.
 const NAV_LINKS = [
-  { label: "Home", id: "hero" },
   { label: "About", id: "about" },
+  { label: "Skills", id: "skills" },
   { label: "Project", id: "projects" },
+  { label: "Experience", id: "experience" },
   { label: "Education", id: "education" },
   { label: "Contact", id: "contact" },
 ] as const;
 
 const Navbar: React.FC = () => {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-
-  // Trigger initial slide-down animation
-  useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const controlNavbar = () => {
       if (typeof window !== "undefined") {
-        if (window.scrollY > lastScrollY && window.scrollY > 50) {
+        if (window.scrollY > lastScrollY && window.scrollY > 80) {
           setShow(false);
         } else {
           setShow(true);
         }
         setLastScrollY(window.scrollY);
+        setIsScrolled(window.scrollY > 20);
 
-        // Modern touch: a thin progress line showing scroll position,
-        // fixed above the nav so it stays visible even when the nav
-        // itself slides away.
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         setScrollProgress(docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0);
       }
@@ -69,20 +64,27 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Scroll progress line */}
-      <div className="fixed top-0 left-0 right-0 z-[60] h-[2px] bg-transparent">
-        <div
-          className="h-full transition-[width] duration-150 ease-out"
-          style={{ width: `${scrollProgress}%`, backgroundColor: ACCENT }}
-        />
-      </div>
-
-      <div
-        className={`fixed top-0 left-0 w-full z-50 flex justify-center px-4 pt-4 md:pt-5 transition-all duration-700 ease-in-out ${show ? "translate-y-0 opacity-100" : "-translate-y-[120%] opacity-0"
+      {/* Full-width edge-to-edge glass bar, flush with the top */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-in-out ${show ? "translate-y-0" : "-translate-y-full"
+          } ${isScrolled
+            ? "bg-black/60 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+            : "bg-black/20 backdrop-blur-md border-b border-white/[0.06]"
           }`}
       >
-        {/* Glassmorphism floating pill */}
-        <nav className="w-full max-w-5xl flex items-center justify-between gap-4 px-5 py-3 md:px-7 md:py-3.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        {/* Moving lime shimmer sweeping along the bottom edge — the "live" cue */}
+        <div className="absolute bottom-0 left-0 right-0 h-px overflow-hidden pointer-events-none">
+          <motion.div
+            className="h-full w-1/3"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
+            }}
+            animate={{ x: ["-100%", "400%"] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-5 md:px-10 h-16 md:h-20 flex items-center justify-between">
           {/* Logo */}
           <a
             href="#hero"
@@ -90,13 +92,18 @@ const Navbar: React.FC = () => {
               e.preventDefault();
               handleNavClick("hero");
             }}
-            className="text-white font-black text-lg md:text-xl tracking-widest uppercase cursor-pointer relative z-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00] rounded-sm"
+            className="flex items-center gap-2 text-white font-black text-lg md:text-xl tracking-widest uppercase cursor-pointer relative z-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00] rounded-sm"
           >
             Seemab Ali
+            <span
+              className="w-1.5 h-1.5 rounded-full animate-pulse"
+              style={{ backgroundColor: ACCENT, boxShadow: `0 0 8px ${ACCENT}` }}
+              aria-hidden="true"
+            />
           </a>
 
-          {/* Navigation Links (Desktop) */}
-          <div className="hidden md:flex items-center gap-7">
+          {/* Navigation Links (Desktop) — animated underline on hover */}
+          <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((item) => (
               <a
                 key={item.id}
@@ -105,9 +112,13 @@ const Navbar: React.FC = () => {
                   e.preventDefault();
                   handleNavClick(item.id);
                 }}
-                className="text-gray-300 text-sm hover:text-[#ccff00] transition-colors uppercase tracking-wider font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00] rounded-sm"
+                className="group relative text-gray-300 text-sm hover:text-white transition-colors uppercase tracking-wider font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ccff00] rounded-sm py-1"
               >
                 {item.label}
+                <span
+                  className="absolute left-0 -bottom-0.5 h-[1.5px] w-full origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"
+                  style={{ backgroundColor: ACCENT }}
+                />
               </a>
             ))}
           </div>
@@ -142,8 +153,16 @@ const Navbar: React.FC = () => {
               </svg>
             )}
           </button>
-        </nav>
-      </div>
+        </div>
+
+        {/* Scroll progress line — sits on the very top edge of the bar itself */}
+        <div className="h-[2px] bg-transparent">
+          <div
+            className="h-full transition-[width] duration-150 ease-out"
+            style={{ width: `${scrollProgress}%`, backgroundColor: ACCENT }}
+          />
+        </div>
+      </nav>
 
       {/* Mobile Menu Overlay — glassmorphism full-screen panel */}
       <div
