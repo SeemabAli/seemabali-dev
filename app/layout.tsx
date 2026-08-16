@@ -48,11 +48,20 @@ export const metadata: Metadata = {
     description:
       "Building modern digital experiences with code & AI. Explore featured projects, engineering skills, and live AI assistant.",
     siteName: "Seemab Ali Portfolio",
+    images: [
+      {
+        url: "https://seemab-dev.vercel.app/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Seemab Ali — Full-Stack Developer · AI · Next.js · TypeScript",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Seemab Ali | Software Engineering Graduate & Modern Web Developer",
     description: "Building modern digital experiences with code & AI.",
+    images: ["https://seemab-dev.vercel.app/og-image.jpg"],
   },
   robots: {
     index: true,

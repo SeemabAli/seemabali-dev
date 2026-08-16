@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Code,
@@ -19,6 +19,59 @@ import SpotlightCard from "@/components/SpotlightCard";
 
 const ACCENT = "#ccff00";
 const ACCENT_RGB = "204,255,0";
+
+/**
+ * Animates a numeric string (e.g. "4", "8") from 0 to the target when
+ * the element enters the viewport. Non-numeric values are returned as-is.
+ */
+function useCountUp(target: string, duration = 1200) {
+  const [display, setDisplay] = useState("0");
+  const ref = useRef<HTMLDivElement>(null);
+  const hasRun = useRef(false);
+
+  // Extract the numeric part and any trailing suffix ("1yr+" → num=1, suffix="yr+")
+  const match = target.match(/^([0-9]+)(.*)$/);
+  const numericValue = match ? parseInt(match[1], 10) : null;
+  const suffix = match ? match[2] : "";
+
+  useEffect(() => {
+    if (numericValue === null) {
+      setDisplay(target);
+      return;
+    }
+
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasRun.current) {
+          hasRun.current = true;
+          const startTime = performance.now();
+
+          const tick = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * numericValue);
+            setDisplay(`${current}${suffix}`);
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+
+          requestAnimationFrame(tick);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [numericValue, suffix, duration, target]);
+
+  return { display, ref };
+}
 
 const PILLARS = [
   {
@@ -49,6 +102,47 @@ const HIGHLIGHTS = [
 ];
 
 const STAT_ICONS = [Layers, Code, GraduationCap, Zap];
+
+// Separate component so each card gets its own useCountUp hook instance
+function StatCard({
+  stat,
+  StatIcon,
+}: {
+  stat: { value: string; label: string; sub: string };
+  StatIcon: React.ElementType;
+}) {
+  const { display, ref } = useCountUp(stat.value, 1400);
+
+  return (
+    <SpotlightCard
+      spotlightRgb={ACCENT_RGB}
+      className="group h-full rounded-2xl border border-white/10 bg-[#080808] p-5 sm:p-6 justify-between hover:border-[#ccff00]/30 transition-all duration-300"
+    >
+      {/* Large faint watermark icon */}
+      <StatIcon
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-3 -right-3 w-20 h-20"
+        style={{ color: `${ACCENT}0D` }}
+      />
+
+      <div
+        className="w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform relative z-10"
+        style={{ color: ACCENT }}
+      >
+        <StatIcon className="w-4 h-4" />
+      </div>
+
+      <div className="relative z-10" ref={ref}>
+        <div className="text-2xl sm:text-3xl font-black text-white tracking-tight tabular-nums">
+          {display}
+        </div>
+        <div className="text-xs font-semibold text-gray-200 mt-1">{stat.label}</div>
+        <div className="text-[11px] font-mono text-gray-500 mt-0.5">{stat.sub}</div>
+      </div>
+    </SpotlightCard>
+  );
+}
+
 
 export default function About() {
   return (
@@ -194,36 +288,7 @@ export default function About() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: idx * 0.1 }}
                 >
-                  <SpotlightCard
-                    spotlightRgb={ACCENT_RGB}
-                    className="group h-full rounded-2xl border border-white/10 bg-[#080808] p-5 sm:p-6 justify-between hover:border-[#ccff00]/30 transition-all duration-300"
-                  >
-                    {/* Large faint watermark icon */}
-                    <StatIcon
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -bottom-3 -right-3 w-20 h-20"
-                      style={{ color: `${ACCENT}0D` }}
-                    />
-
-                    <div
-                      className="w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform relative z-10"
-                      style={{ color: ACCENT }}
-                    >
-                      <StatIcon className="w-4 h-4" />
-                    </div>
-
-                    <div className="relative z-10">
-                      <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                        {stat.value}
-                      </div>
-                      <div className="text-xs font-semibold text-gray-200 mt-1">
-                        {stat.label}
-                      </div>
-                      <div className="text-[11px] font-mono text-gray-500 mt-0.5">
-                        {stat.sub}
-                      </div>
-                    </div>
-                  </SpotlightCard>
+                  <StatCard stat={stat} StatIcon={StatIcon} />
                 </motion.div>
               );
             })}

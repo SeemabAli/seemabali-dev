@@ -12,32 +12,25 @@ const NAV_LINKS = [
   { label: "Skills", id: "skills" },
   { label: "Projects", id: "projects" },
   { label: "Experience", id: "experience" },
+  { label: "Certs", id: "certifications" },
   { label: "Education", id: "education" },
   { label: "Contact", id: "contact" },
 ] as const;
 
 export default function Navbar() {
-  const [show, setShow] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("hero");
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 90) {
-        setShow(false);
-      } else {
-        setShow(true);
-      }
-      setLastScrollY(currentScrollY);
-      setIsScrolled(currentScrollY > 15);
+      setIsScrolled(window.scrollY > 15);
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   // Track currently active section for navbar highlight
   useEffect(() => {
@@ -81,8 +74,6 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
-          show ? "translate-y-0" : "-translate-y-full"
-        } ${
           isScrolled
             ? "bg-black/85 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.8)]"
             : "bg-black/30 backdrop-blur-md border-b border-white/[0.06]"

@@ -38,6 +38,7 @@ export default function Contact({ onOpenChat }: ContactProps) {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const projectTypes = [
     "Full-Time Role",
@@ -53,14 +54,28 @@ export default function Contact({ onOpenChat }: ContactProps) {
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.name || !formState.email || !formState.message) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    // Simulate fast client dispatch + trigger celebratory confetti
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setSubmitError(data.error ?? "Something went wrong. Please try emailing directly.");
+        setIsSubmitting(false);
+        return;
+      }
+
       setIsSubmitting(false);
       setSubmitted(true);
 
@@ -70,7 +85,10 @@ export default function Contact({ onOpenChat }: ContactProps) {
         origin: { y: 0.7 },
         colors: [ACCENT, "#ffffff", "#9ca3af"],
       });
-    }, 600);
+    } catch {
+      setSubmitError("Network error. Please try emailing directly.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -432,6 +450,13 @@ export default function Contact({ onOpenChat }: ContactProps) {
                       </>
                     )}
                   </button>
+
+                  {/* Error state */}
+                  {submitError && (
+                    <p className="text-xs text-red-400 text-center pt-1 font-mono">
+                      ⚠ {submitError}
+                    </p>
+                  )}
                 </form>
               )}
             </SpotlightCard>

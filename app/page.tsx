@@ -8,11 +8,13 @@ import About from "@/components/About";
 import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
+import Certifications from "@/components/Certifications";
 import Education from "@/components/Education";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import AIChatbot from "@/components/AIChatbot";
 import LoadingScreen from "@/components/LoadingScreen";
+import ScrollProgress from "@/components/ScrollProgress";
 
 export default function PortfolioPage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -45,6 +47,9 @@ export default function PortfolioPage() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="relative min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500/20 selection:text-cyan-200"
           >
+            {/* Scroll progress bar */}
+            <ScrollProgress />
+
             {/* Sticky Glass Navbar */}
             <Navbar />
 
@@ -62,6 +67,9 @@ export default function PortfolioPage() {
 
             {/* Experience Timeline Section */}
             <Experience />
+
+            {/* Certifications Section */}
+            <Certifications />
 
             {/* Education Section */}
             <Education />

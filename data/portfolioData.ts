@@ -57,6 +57,16 @@ export interface EducationItem {
   achievements: string[];
 }
 
+export interface CertificationItem {
+  title: string;
+  issuer: string;
+  year: string;
+  /** One of the preset icon keys mapped in Certifications.tsx */
+  issuerKey: "meta" | "w3schools" | "udemy" | "navttc" | "hitesh";
+  /** External link — defaults to LinkedIn certifications if no specific URL */
+  url: string;
+}
+
 export interface PersonalInfo {
   name: string;
   /** Short studio/site wordmark shown in the Navbar logo — also the
@@ -104,10 +114,10 @@ export const portfolioData = {
     resumeUrl: "/files/Seemab_MERN.pdf",
     heroPhoto: "/images/hero-portrait.png",
     stats: [
-      { value: "10+", label: "Projects Completed", sub: "Production & Academic" },
-      { value: "Full-Stack", label: "Core Experience", sub: "React, Next.js, Nodejs, Sitecore AI" },
-      { value: "2022–2026", label: "BS Software Eng.", sub: "Virtual University" },
-      { value: "AI + Web", label: "Specialization", sub: "LLMs, LangChain, APIs" },
+      { value: "1yr+", label: "Professional Experience", sub: "7 Kings Code LLC" },
+      { value: "4", label: "Production Apps Shipped", sub: "Full-Stack & AI" },
+      { value: "3", label: "AI Systems Built", sub: "LLMs, LangChain, RAG" },
+      { value: "8", label: "Certifications Earned", sub: "Meta, Udemy, W3Schools" },
     ],
   } as PersonalInfo,
 
@@ -376,4 +386,63 @@ export const portfolioData = {
       "Is Seemab available for work?",
     ],
   },
+
+  certifications: [
+    {
+      title: "META Front-End Developer",
+      issuer: "Meta (Facebook)",
+      year: "2024",
+      issuerKey: "meta",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "META Back-End Developer",
+      issuer: "Meta (Facebook)",
+      year: "2024",
+      issuerKey: "meta",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "META JavaScript Programming",
+      issuer: "Meta (Facebook)",
+      year: "2024",
+      issuerKey: "meta",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "META Version Control",
+      issuer: "Meta (Facebook)",
+      year: "2024",
+      issuerKey: "meta",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "Certified React Developer",
+      issuer: "W3Schools",
+      year: "2024",
+      issuerKey: "w3schools",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "The Complete 2024 Web Development Bootcamp",
+      issuer: "Dr. Angela Yu / Udemy",
+      year: "2024",
+      issuerKey: "udemy",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "Full Stack Development",
+      issuer: "Hitesh Choudhary",
+      year: "2025",
+      issuerKey: "hitesh",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+    {
+      title: "NAVTTC — Summer of Code",
+      issuer: "NAVTTC Pakistan",
+      year: "2024",
+      issuerKey: "navttc",
+      url: "https://linkedin.com/in/seemabali7335/details/certifications/",
+    },
+  ] as CertificationItem[],
 };
