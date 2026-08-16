@@ -38,34 +38,43 @@ export default function Projects() {
 
   const projects = portfolioData.projects;
 
+  const rafRef = useRef<number | null>(null);
+
   const updateScrollState = useCallback(() => {
-    if (!carouselRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-    setCanScrollPrev(scrollLeft > 15);
-    setCanScrollNext(scrollLeft < scrollWidth - clientWidth - 15);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
-    const cards = carouselRef.current.querySelectorAll<HTMLElement>("[data-project-card]");
-    if (cards.length > 0) {
-      let closestIndex = 0;
-      let minDistance = Infinity;
-      const containerLeft = carouselRef.current.getBoundingClientRect().left;
+    rafRef.current = requestAnimationFrame(() => {
+      if (!carouselRef.current) return;
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      setCanScrollPrev(scrollLeft > 15);
+      setCanScrollNext(scrollLeft < scrollWidth - clientWidth - 15);
 
-      cards.forEach((card, idx) => {
-        const rect = card.getBoundingClientRect();
-        const distance = Math.abs(rect.left - containerLeft);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestIndex = idx;
-        }
-      });
-      setActiveIndex(closestIndex);
-    }
+      const cards = carouselRef.current.querySelectorAll<HTMLElement>("[data-project-card]");
+      if (cards.length > 0) {
+        let closestIndex = 0;
+        let minDistance = Infinity;
+        const containerLeft = carouselRef.current.getBoundingClientRect().left;
+
+        cards.forEach((card, idx) => {
+          const rect = card.getBoundingClientRect();
+          const distance = Math.abs(rect.left - containerLeft);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = idx;
+          }
+        });
+        setActiveIndex(closestIndex);
+      }
+    });
   }, []);
 
   useEffect(() => {
     updateScrollState();
-    window.addEventListener("resize", updateScrollState);
-    return () => window.removeEventListener("resize", updateScrollState);
+    window.addEventListener("resize", updateScrollState, { passive: true });
+    return () => {
+      window.removeEventListener("resize", updateScrollState);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [updateScrollState]);
 
   const scrollToIndex = (index: number) => {
@@ -273,13 +282,13 @@ export default function Projects() {
           <div
             ref={carouselRef}
             onScroll={updateScrollState}
-            className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 px-4 sm:px-6 lg:px-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden touch-pan-x"
+            className="flex gap-5 sm:gap-6 overflow-x-auto snap-x snap-mandatory py-4 px-4 sm:px-6 lg:px-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-x-contain touch-pan-y"
           >
             {projects.map((project) => (
               <div
                 key={project.id}
                 data-project-card
-                className="snap-start relative rounded-3xl w-[86vw] sm:w-[350px] lg:w-[385px] shrink-0 flex flex-col"
+                className="snap-center sm:snap-start relative rounded-3xl w-[84vw] max-w-[360px] sm:w-[350px] lg:w-[385px] shrink-0 flex flex-col"
               >
                 {/* Rotating gradient ring for featured projects */}
                 {project.featured && (
