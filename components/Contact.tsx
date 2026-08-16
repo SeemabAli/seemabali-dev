@@ -94,11 +94,10 @@ export default function Contact({ onOpenChat }: ContactProps) {
   return (
     <section id="contact" className="py-24 relative bg-black overflow-hidden">
       {/* Background ambient lighting */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full blur-[160px] pointer-events-none"
+      <div
+        aria-hidden="true"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] sm:w-[700px] h-[350px] sm:h-[500px] rounded-full blur-[100px] sm:blur-[160px] opacity-40 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}18 0%, transparent 70%)` }}
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

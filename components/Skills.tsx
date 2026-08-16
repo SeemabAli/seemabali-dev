@@ -44,18 +44,16 @@ export default function Skills() {
 
   return (
     <section id="skills" className="py-24 relative bg-black overflow-hidden">
-      {/* Slowly drifting ambient glows — the "alive" background */}
-      <motion.div
-        className="absolute top-1/2 left-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none"
+      {/* Ambient background glows */}
+      <div
+        aria-hidden="true"
+        className="absolute top-1/2 left-0 w-80 sm:w-96 h-80 sm:h-96 rounded-full blur-[100px] sm:blur-[140px] opacity-40 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}1F 0%, transparent 70%)` }}
-        animate={{ x: [0, 60, 0], y: [0, 30, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
-        className="absolute bottom-10 right-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none"
+      <div
+        aria-hidden="true"
+        className="absolute bottom-10 right-0 w-80 sm:w-96 h-80 sm:h-96 rounded-full blur-[100px] sm:blur-[140px] opacity-35 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
-        animate={{ x: [0, -50, 0], y: [0, -40, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

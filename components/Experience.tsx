@@ -20,11 +20,10 @@ export default function Experience() {
   return (
     <section id="experience" className="py-24 relative bg-black overflow-hidden">
       {/* Background ambient glow */}
-      <motion.div
-        className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none"
+      <div
+        aria-hidden="true"
+        className="absolute top-1/2 right-0 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] rounded-full blur-[100px] sm:blur-[150px] opacity-35 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
-        animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.45, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

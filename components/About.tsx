@@ -147,12 +147,11 @@ function StatCard({
 export default function About() {
   return (
     <section id="about" className="relative py-24 bg-black overflow-hidden">
-      {/* Drifting ambient glow */}
-      <motion.div
-        className="pointer-events-none absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[150px]"
+      {/* Ambient background glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] rounded-full blur-[100px] sm:blur-[140px] opacity-50 transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
-        animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.04)_0%,_transparent_60%)]" />
 

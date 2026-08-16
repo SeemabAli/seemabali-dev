@@ -212,12 +212,11 @@ export default function Projects() {
 
   return (
     <section id="projects" className="py-24 relative bg-black overflow-hidden">
-      {/* Drifting ambient glow */}
-      <motion.div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[150px] pointer-events-none"
+      {/* Ambient background glow */}
+      <div
+        aria-hidden="true"
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[380px] sm:w-[600px] h-[380px] sm:h-[600px] rounded-full blur-[100px] sm:blur-[150px] opacity-40 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

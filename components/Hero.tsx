@@ -105,39 +105,30 @@ const Hero: React.FC<HeroProps> = ({ onPreloadComplete, onOpenChat }) => {
         className="relative z-10 w-full h-[calc(100dvh-4.5rem)] sm:h-[calc(100dvh-5rem)] flex items-end justify-center pointer-events-none"
       >
         {/* Sweeping Neon Glow Behind Portrait */}
-        <motion.div
+        <div
           aria-hidden="true"
-          className="absolute top-1/2 -translate-y-1/2 z-0 w-80 sm:w-[480px] md:w-[600px] aspect-square rounded-full blur-3xl opacity-60 pointer-events-none"
+          className="absolute top-1/2 -translate-y-1/2 z-0 w-72 sm:w-[480px] md:w-[600px] aspect-square rounded-full blur-2xl sm:blur-3xl opacity-50 sm:opacity-60 pointer-events-none transform-gpu"
           style={{
             background: `radial-gradient(circle, ${ACCENT}85 0%, ${ACCENT}25 45%, transparent 75%)`,
-          }}
-          animate={{
-            x: ["-16%", "16%", "-16%"],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 6.5,
-            repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
 
         {/* Large Portrait Image Spanning Below Navbar to Hero Bottom */}
-        <div className="relative z-10 w-full h-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[660px] flex items-end justify-center">
+        <div className="relative z-10 w-full h-full max-w-[320px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[660px] flex items-end justify-center">
           <Image
             src={centerImage}
             alt="Seemab Ali - Full-Stack Developer"
             priority={true}
             fetchPriority="high"
-            quality={95}
-            sizes="(max-width: 640px) 340px, (max-width: 768px) 460px, (max-width: 1024px) 560px, 660px"
-            className="w-full h-full object-contain object-bottom drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] filter contrast-[1.03]"
+            quality={90}
+            sizes="(max-width: 640px) 320px, (max-width: 768px) 460px, (max-width: 1024px) 560px, 660px"
+            className="w-full h-full object-contain object-bottom drop-shadow-[0_20px_50px_rgba(0,0,0,0.95)] filter contrast-[1.03]"
           />
         </div>
       </motion.div>
 
       {/* 3. Mobile Header (Seemab Ali + Role & CTA under navbar) */}
-      <div className="md:hidden absolute top-18 sm:top-20 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center text-center gap-1.5 pointer-events-auto w-full px-4">
+      <div className="md:hidden absolute top-20 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center text-center gap-2 pointer-events-auto w-full px-4">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}

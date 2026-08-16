@@ -20,6 +20,7 @@
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -29,6 +30,10 @@
     selection-background-color: #38bdf8;
     selection-color: #030712;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
   }
 
   /* Custom high-end scrollbar */

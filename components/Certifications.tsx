@@ -80,9 +80,9 @@ const CertMarquee = () => {
       <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-black to-transparent z-10" />
 
       <motion.div
-        className="flex gap-6 w-max"
+        className="flex gap-6 w-max will-change-transform"
         animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
       >
         {items.map((cert, i) => (
           <div
@@ -113,11 +113,10 @@ export default function Certifications() {
   return (
     <section id="certifications" className="py-24 relative bg-black overflow-hidden">
       {/* Ambient glow */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full blur-[160px] pointer-events-none"
+      <div
+        aria-hidden="true"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[600px] h-[300px] sm:h-[400px] rounded-full blur-[100px] sm:blur-[160px] opacity-35 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
-        animate={{ scale: [1, 1.12, 1] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
