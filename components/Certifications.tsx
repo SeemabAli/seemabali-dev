@@ -111,7 +111,7 @@ export default function Certifications() {
   const certs = portfolioData.certifications;
 
   return (
-    <section id="certifications" className="py-24 relative bg-black overflow-hidden">
+    <section id="certifications" className="py-24 relative bg-transparent overflow-hidden">
       {/* Ambient glow */}
       <div
         aria-hidden="true"

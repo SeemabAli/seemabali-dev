@@ -15,6 +15,7 @@ import Footer from "@/components/Footer";
 import AIChatbot from "@/components/AIChatbot";
 import LoadingScreen from "@/components/LoadingScreen";
 import ScrollProgress from "@/components/ScrollProgress";
+import MatrixBackground from "@/components/MatrixBackground";
 
 export default function PortfolioPage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -47,6 +48,9 @@ export default function PortfolioPage() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="relative min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500/20 selection:text-cyan-200"
           >
+            {/* Live Subtle Matrix Background Stream */}
+            <MatrixBackground />
+
             {/* Scroll progress bar */}
             <ScrollProgress />
 

@@ -18,7 +18,7 @@ const ACCENT_RGB = "204,255,0";
 
 export default function Experience() {
   return (
-    <section id="experience" className="py-24 relative bg-black overflow-hidden">
+    <section id="experience" className="py-24 relative bg-transparent overflow-hidden">
       {/* Background ambient glow */}
       <div
         aria-hidden="true"

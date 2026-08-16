@@ -73,10 +73,7 @@ const Hero: React.FC<HeroProps> = ({ onPreloadComplete, onOpenChat }) => {
   return (
     <section
       id="hero"
-      className="relative h-[100dvh] min-h-[580px] flex items-end justify-center bg-black overflow-hidden select-none"
-      style={{
-        background: "radial-gradient(circle at 50% 50%, #151a0d 0%, #000000 85%)",
-      }}
+      className="relative h-[100dvh] min-h-[580px] flex items-end justify-center bg-transparent overflow-hidden select-none"
     >
       {/* Ambient background grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none" />

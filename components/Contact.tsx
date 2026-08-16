@@ -92,7 +92,7 @@ export default function Contact({ onOpenChat }: ContactProps) {
   };
 
   return (
-    <section id="contact" className="py-24 relative bg-black overflow-hidden">
+    <section id="contact" className="py-24 relative bg-transparent overflow-hidden">
       {/* Background ambient lighting */}
       <div
         aria-hidden="true"

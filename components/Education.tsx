@@ -20,13 +20,12 @@ export default function Education() {
   const edu = portfolioData.education[0];
 
   return (
-    <section id="education" className="py-24 relative bg-black overflow-hidden">
+    <section id="education" className="py-24 relative bg-transparent overflow-hidden">
       {/* Background ambient glow */}
-      <motion.div
-        className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none"
+      <div
+        aria-hidden="true"
+        className="absolute top-1/3 left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] rounded-full blur-[100px] sm:blur-[160px] opacity-35 pointer-events-none transform-gpu"
         style={{ background: `radial-gradient(circle, ${ACCENT}14 0%, transparent 70%)` }}
-        animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.45, 0.3] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

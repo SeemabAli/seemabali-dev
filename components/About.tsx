@@ -146,7 +146,7 @@ function StatCard({
 
 export default function About() {
   return (
-    <section id="about" className="relative py-24 bg-black overflow-hidden">
+    <section id="about" className="relative py-24 bg-transparent overflow-hidden">
       {/* Ambient background glow */}
       <div
         aria-hidden="true"

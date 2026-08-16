@@ -43,7 +43,7 @@ export default function Skills() {
   const tabs = ["all", ...portfolioData.skills.map((c) => c.title)];
 
   return (
-    <section id="skills" className="py-24 relative bg-black overflow-hidden">
+    <section id="skills" className="py-24 relative bg-transparent overflow-hidden">
       {/* Ambient background glows */}
       <div
         aria-hidden="true"

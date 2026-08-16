@@ -211,7 +211,7 @@ export default function Projects() {
   };
 
   return (
-    <section id="projects" className="py-24 relative bg-black overflow-hidden">
+    <section id="projects" className="py-24 relative bg-transparent overflow-hidden">
       {/* Ambient background glow */}
       <div
         aria-hidden="true"
