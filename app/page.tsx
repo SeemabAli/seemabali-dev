@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -11,9 +12,11 @@ import Education from "@/components/Education";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import AIChatbot from "@/components/AIChatbot";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function PortfolioPage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const toggleChat = () => {
     setIsChatOpen((prev) => !prev);
@@ -24,36 +27,56 @@ export default function PortfolioPage() {
   };
 
   return (
-    <main className="relative min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500/20 selection:text-cyan-200">
-      {/* Sticky Glass Navbar */}
-      <Navbar />
+    <>
+      {/* Loading Screen — sits on top until portfolio is fully loaded */}
+      <AnimatePresence>
+        {!isLoaded && (
+          <LoadingScreen onDone={() => setIsLoaded(true)} />
+        )}
+      </AnimatePresence>
 
-      {/* Hero Section */}
-      <Hero onOpenChat={openChat} />
+      {/* Portfolio — fades in once loading is done */}
+      <AnimatePresence>
+        {isLoaded && (
+          <motion.main
+            key="portfolio"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500/20 selection:text-cyan-200"
+          >
+            {/* Sticky Glass Navbar */}
+            <Navbar />
 
-      {/* About Section with Stats */}
-      <About />
+            {/* Hero Section */}
+            <Hero onOpenChat={openChat} />
 
-      {/* Skills & Tech Stack Section */}
-      <Skills />
+            {/* About Section with Stats */}
+            <About />
 
-      {/* Projects Showcase Section */}
-      <Projects />
+            {/* Skills & Tech Stack Section */}
+            <Skills />
 
-      {/* Experience Timeline Section */}
-      <Experience />
+            {/* Projects Showcase Section */}
+            <Projects />
 
-      {/* Education Section */}
-      <Education />
+            {/* Experience Timeline Section */}
+            <Experience />
 
-      {/* Contact Section */}
-      <Contact onOpenChat={openChat} />
+            {/* Education Section */}
+            <Education />
 
-      {/* Footer */}
-      <Footer />
+            {/* Contact Section */}
+            <Contact onOpenChat={openChat} />
 
-      {/* Interactive AI Chatbot */}
-      <AIChatbot isOpen={isChatOpen} onToggle={toggleChat} />
-    </main>
+            {/* Footer */}
+            <Footer />
+
+            {/* Interactive AI Chatbot */}
+            <AIChatbot isOpen={isChatOpen} onToggle={toggleChat} />
+          </motion.main>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
