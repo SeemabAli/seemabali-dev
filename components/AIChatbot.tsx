@@ -187,14 +187,14 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onToggle}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#0d1424] text-white border border-[#ccff00]/40 shadow-[0_0_25px_rgba(204,255,0,0.25)] hover:shadow-[0_0_35px_rgba(204,255,0,0.4)] transition-all duration-300 group"
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#080808] text-white border border-[#ccff00]/40 shadow-[0_0_25px_rgba(204,255,0,0.25)] hover:shadow-[0_0_35px_rgba(204,255,0,0.4)] transition-all duration-300 group"
             aria-label="Toggle Portfolio AI Assistant"
           >
             <div className="relative flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-[#ccff00] animate-pulse" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 radar-dot" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#ccff00] radar-dot" />
             </div>
-            <span className="text-xs font-semibold tracking-wide hidden sm:inline text-slate-200 group-hover:text-white">
+            <span className="text-xs font-semibold font-mono tracking-wide hidden sm:inline text-gray-200 group-hover:text-white">
               Ask Seemi AI
             </span>
           </motion.button>
@@ -210,25 +210,25 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             style={{ position: "fixed" }}
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[calc(100vh-4rem)] flex flex-col rounded-2xl glass-card-glow border border-white/15 overflow-hidden shadow-2xl bg-slate-950/90 backdrop-blur-xl"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[calc(100vh-4rem)] flex flex-col rounded-3xl border border-white/15 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.95)] bg-[#080808]/95 backdrop-blur-2xl"
           >
             {/* Header */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/80">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#050505]">
               <div className="flex items-center gap-3">
                 <div className="relative p-2 rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00]">
                   <Bot className="w-5 h-5" />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-slate-900" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#ccff00] border border-black" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-white tracking-tight">
+                    <h3 className="text-sm font-bold text-white tracking-tight uppercase font-mono">
                       Seemi AI
                     </h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30">
                       Gemini 3.6
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-gray-400 font-mono">
                     Seemab Ali Representative
                   </p>
                 </div>
@@ -237,14 +237,14 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
               <div className="flex items-center gap-1">
                 <button
                   onClick={handleClearChat}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition-colors"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
                   title="Clear Chat History"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={onToggle}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition-colors"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
                   title="Minimize"
                 >
                   <Minimize2 className="w-4 h-4" />
@@ -271,7 +271,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                     <div
                       className={`p-1.5 rounded-lg text-xs font-bold ${
                         isUser
-                          ? "bg-sky-500/20 text-sky-300 border border-sky-500/30"
+                          ? "bg-white/10 text-white border border-white/15"
                           : "bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30"
                       }`}
                     >
@@ -280,17 +280,17 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
 
                     <div className="flex flex-col max-w-[82%] group">
                       <div
-                        className={`p-3.5 rounded-2xl text-slate-200 leading-relaxed ${
+                        className={`p-3.5 rounded-2xl leading-relaxed ${
                           isUser
-                            ? "bg-sky-600/30 border border-sky-500/30 rounded-tr-none text-white"
-                            : "bg-slate-900/80 border border-white/10 rounded-tl-none"
+                            ? "bg-[#141414] border border-white/15 rounded-tr-none text-white font-medium"
+                            : "bg-[#0d0d0d] border border-white/10 rounded-tl-none text-gray-200"
                         }`}
                       >
                         <div className="whitespace-pre-wrap">{message.content}</div>
                       </div>
 
                       <div
-                        className={`flex items-center gap-2 mt-1 px-1 text-[10px] text-slate-500 ${
+                        className={`flex items-center gap-2 mt-1 px-1 text-[10px] text-gray-500 font-mono ${
                           isUser ? "justify-end" : "justify-start"
                         }`}
                       >
@@ -298,10 +298,10 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                         {!isUser && (
                           <button
                             onClick={() => handleCopyMessage(message.id, message.content)}
-                            className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-200 transition-opacity"
+                            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity"
                           >
                             {copiedId === message.id ? (
-                              <Check className="w-3 h-3 text-emerald-400" />
+                              <Check className="w-3 h-3 text-[#ccff00]" />
                             ) : (
                               <Copy className="w-3 h-3" />
                             )}
@@ -322,7 +322,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                   <div className="p-1.5 rounded-lg bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30">
                     <Bot className="w-4 h-4" />
                   </div>
-                  <div className="p-3.5 rounded-2xl rounded-tl-none bg-slate-900/80 border border-white/10 flex items-center gap-1.5">
+                  <div className="p-3.5 rounded-2xl rounded-tl-none bg-[#0d0d0d] border border-white/10 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-bounce" />
                     <span
                       className="w-2 h-2 rounded-full bg-[#ccff00] animate-bounce"
@@ -341,12 +341,12 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
 
             {/* Suggested Question Pills */}
             {messages.length < 4 && (
-              <div className="px-4 py-2 border-t border-white/5 bg-slate-950/60 overflow-x-auto flex gap-2 text-xs scrollbar-none">
+              <div className="px-4 py-2 border-t border-white/5 bg-[#050505] overflow-x-auto flex gap-2 text-xs scrollbar-none">
                 {suggestedQuestions.map((q, i) => (
                   <button
                     key={i}
                     onClick={() => handleSendMessage(q)}
-                    className="whitespace-nowrap px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 hover:border-[#ccff00]/40 transition-all text-[11px]"
+                    className="whitespace-nowrap px-3 py-1 rounded-full bg-[#0d0d0d] hover:bg-[#161616] text-gray-300 hover:text-[#ccff00] border border-white/10 hover:border-[#ccff00]/40 transition-all font-mono text-[11px]"
                   >
                     {q}
                   </button>
@@ -360,7 +360,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                 e.preventDefault();
                 handleSendMessage();
               }}
-              className="p-3 border-t border-white/10 bg-slate-900/90 flex items-center gap-2"
+              className="p-3 border-t border-white/10 bg-[#050505] flex items-center gap-2"
             >
               <input
                 ref={inputRef}
@@ -368,13 +368,13 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about skills, CodeScry AI, or availability..."
-                className="flex-1 bg-slate-950 text-white placeholder-slate-500 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-white/10 focus:outline-none focus:border-[#ccff00]/50 transition-colors"
+                className="flex-1 bg-[#080808] text-white placeholder-gray-500 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-white/10 focus:outline-none focus:border-[#ccff00]/60 transition-colors font-mono"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className="p-2.5 rounded-xl bg-[#ccff00] text-slate-950 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all"
+                className="p-2.5 rounded-xl bg-[#ccff00] text-black font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(204,255,0,0.3)]"
               >
                 <Send className="w-4 h-4" />
               </button>
