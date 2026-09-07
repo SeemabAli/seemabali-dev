@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
+import LighthouseBadge from "@/components/LighthouseBadge";
+import CodeScryShowcase from "@/components/CodeScryShowcase";
 import Experience from "@/components/Experience";
 import Certifications from "@/components/Certifications";
 import Education from "@/components/Education";
@@ -63,11 +65,17 @@ export default function PortfolioPage() {
             {/* About Section with Stats */}
             <About />
 
+            {/* Chrome DevTools Lighthouse Score Badges */}
+            <LighthouseBadge />
+
             {/* Skills & Tech Stack Section */}
             <Skills />
 
             {/* Projects Showcase Section */}
             <Projects />
+
+            {/* CodeScry AI Flagship Architecture Deep Dive */}
+            <CodeScryShowcase />
 
             {/* Experience Timeline Section */}
             <Experience />
@@ -83,12 +91,14 @@ export default function PortfolioPage() {
 
             {/* Footer */}
             <Footer />
-
-            {/* Interactive AI Chatbot */}
-            <AIChatbot isOpen={isChatOpen} onToggle={toggleChat} />
           </motion.main>
         )}
       </AnimatePresence>
+
+      {/* Dynamic Gemini API Chatbot (Fixed Viewport Layer) */}
+      {isLoaded && (
+        <AIChatbot isOpen={isChatOpen} onToggle={toggleChat} />
+      )}
     </>
   );
 }
