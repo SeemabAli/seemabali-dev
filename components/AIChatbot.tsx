@@ -114,6 +114,7 @@ export default function AIChatbot({ isOpen, onToggle }: AIChatbotProps) {
         headers: {
           "Content-Type": "application/json",
         },
+        signal: AbortSignal.timeout(25000),
         body: JSON.stringify({
           messages: [...messages, userMessage].map((m) => ({
             role: m.role,
