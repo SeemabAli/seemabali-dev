@@ -111,7 +111,7 @@ export const portfolioData = {
     email: "seemabali@proton.me",
     github: "https://github.com/seemabali",
     linkedin: "https://linkedin.com/in/seemabali7335",
-    resumeUrl: "/files/Seemab_MERN.pdf",
+    resumeUrl: "/files/Seemab_AI_Application_Dev.pdf",
     heroPhoto: "/images/hero-portrait.png",
     stats: [
       { value: "1yr+", label: "Professional Experience", sub: "7 Kings Code LLC" },
